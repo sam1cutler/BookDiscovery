@@ -2,4 +2,33 @@
 
 * {
   box-sizing: border-box;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+button, input[type="text"] {
+  padding: 5px;
+  margin: 10px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 20 auto;
+  padding: 20px;
+}
+
+.submission-field {
+  margin: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.clear-button {
+  margin-top: 20px;
+}
+
+#js-error-message {
+  color: red;
+  font-size: 20px;
 }

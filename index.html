@@ -12,8 +12,42 @@
 </head>
 
 <body>
-  <main>
+  <main class='container'>
+
+    <header>
       <h1>Book Recommendation App</h1>
+    </header>
+
+    <hr>
+
+    <section class='summary-explanation'>
+      <h3>This app will provide author recommendations based on any combination of artists or pieces of art.</h3>
+    </section>
+
+    <section class='submission-section'>
+      <h3>Enter at least 1, and as many as 4, books/authors/musicians/albums/TV shows/movies - anything you like!</h3>
+      <p>Eventually, will include some "guidance" to help facilitate more-successful searches.</p>
+
+      <form class='submission-form'>
+        <label for="js-search-field1">Thing 1:</label>
+          <input type="text" name="js-search-field1" id="js-search-field1" required></input><br>
+        <label for="js-search-field2">Thing 2:</label>
+          <input type="text" name="js-search-field2" id="js-search-field2"></input><br>
+        <label for="js-search-field3">Thing 3:</label>
+          <input type="text" name="js-search-field3" id="js-search-field3"></input><br>
+        
+        <button type="submit">Find my recommendations!</button>
+      </form>
+    </section>
+
+    <section class='results hidden'></section>
+
+    <hr>
+
+    <footer>
+      <h4>This tool uses the <a href='https://tastedive.com/read/api' target='_blank'>TasteDive API</a>.</h4>
+    </footer>
+
   </main>
   <script src="https://code.jquery.com/jquery-3.4.1.slim.js" crossorigin="anonymous"></script>
   <script src="index.js"></script>
