@@ -35,7 +35,7 @@
           <label for="js-search-field1">Thing 1:</label>
             <input type="text" name="js-search-field1" id="js-search-field1" required></input>
         </div><br>
-        <div class='submission-field'></div>
+        <div class='submission-field'>
           <label for="js-search-field2">Thing 2:</label>
             <input type="text" name="js-search-field2" id="js-search-field2"></input><br>
         </div><br>
@@ -48,7 +48,10 @@
       </form>
     </section>
 
-    <section class='results hidden'></section>
+    <section class='results hidden'>
+      <h2>Here are your recommendations:</h2>
+      <ul class="js-results-list"></ul>
+    </section>
 
     <hr>
 
@@ -59,7 +62,7 @@
   </main>
   <script src="https://code.jquery.com/jquery-3.4.1.slim.js" crossorigin="anonymous"></script>
   <script src="index.js"></script>
-  <script src="jsonPlibrary.txt"></script>
+  <script src="jsonPlibrary.js"></script>
 </body>
 
 </html>
