@@ -50,7 +50,7 @@ function getRecommendations(requestedReferencesArray) {
     };
 
     const queryString = formatQueryParams(params);
-    const URLtoBeFetched = proxyURL+baseEndpoint+queryString;
+    const URLtoBeFetched = baseEndpoint+queryString;
     console.log(URLtoBeFetched);
 
     const options = {
@@ -59,15 +59,16 @@ function getRecommendations(requestedReferencesArray) {
         })
     };
 
-    fetch(URLtoBeFetched)
+    fetchJsonp(URLtoBeFetched)
         .then(response => {
             if (response.ok) {
-                //return response.json();
-                console.log(response.json());
+                return response.json();
+                //console.log(response.json());
             }
             throw new Error(response.statusText);
         })
-        .then(responseJson => displayResults(responseJson))
+        .then(responseJson => console.log(responseJson))
+        //.then(responseJson => displayResults(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });

@@ -9,6 +9,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet"
     type="text/css" />
   <link href="style.css" rel="stylesheet" type="text/css" />
+  
 </head>
 
 <body>
@@ -29,13 +30,20 @@
       <p>Eventually, will include some "guidance" to help facilitate more-successful searches.</p>
 
       <form class='submission-form'>
-        <label for="js-search-field1">Thing 1:</label>
-          <input type="text" name="js-search-field1" id="js-search-field1" required></input><br>
-        <label for="js-search-field2">Thing 2:</label>
-          <input type="text" name="js-search-field2" id="js-search-field2"></input><br>
-        <label for="js-search-field3">Thing 3:</label>
-          <input type="text" name="js-search-field3" id="js-search-field3"></input><br>
         
+        <div class='submission-field'>
+          <label for="js-search-field1">Thing 1:</label>
+            <input type="text" name="js-search-field1" id="js-search-field1" required></input>
+        </div><br>
+        <div class='submission-field'></div>
+          <label for="js-search-field2">Thing 2:</label>
+            <input type="text" name="js-search-field2" id="js-search-field2"></input><br>
+        </div><br>
+        <div class='submission-field'>
+          <label for="js-search-field3">Thing 3:</label>
+          <input type="text" name="js-search-field3" id="js-search-field3"></input><br>
+        </div><br>
+
         <button type="submit">Find my recommendations!</button>
       </form>
     </section>
@@ -51,6 +59,7 @@
   </main>
   <script src="https://code.jquery.com/jquery-3.4.1.slim.js" crossorigin="anonymous"></script>
   <script src="index.js"></script>
+  <script src="jsonPlibrary.txt"></script>
 </body>
 
 </html>
