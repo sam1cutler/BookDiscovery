@@ -16,24 +16,20 @@ const baseEndpoint = 'https://tastedive.com/api/similar?';
 
 // Create the HTML string for each item in the results list
 function createResultsListItemString(resultObject) {
-    //console.log('Ran createResultsListItemString function.')
-    console.log(resultObject.Name);
 
-    // Create the string that works for both Alibris and IndieBound searches
-    const searchUrlTargetString = resultObject.Name.replace(/ /g, '+');
+    // Create a shorthand name replacing spaces with plus signs
+    const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
 
-    // Do the NYTimes Books API call to get relevant reviews
-    const nyTimesReviewInfo = getNyTimesReviewInfo(resultObject.Name);
-
+    // TO-DO: need to incorporate the type (author or book) into the button value to make the NYTimes API call work.
 
     return `
         <li>${resultObject.Name}
             <ul>
-                <li>Teaser here.</li>
-                <li>Wikipedia link here.</li>
-                <li>NYTimes book review link here.</li>
-                <li>Search for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${searchUrlTargetString}' target='_blank'>here</a>.</li>
-                <li>Search for books available at local bookstores <a href='https://www.indiebound.org/search/book?keys=${searchUrlTargetString}' target='_blank'>here</a>.</li>
+                <li>${resultObject.wTeaser}</li>
+                <li><a href='${resultObject.wURL}'>Click here for the full Wikipedia page</a>.</li>
+                <li><button type="button" class='js-book-review-button' value='${resultHitShorthand}'>Click here to find a relevant New York Times book review.</button></li>
+                <li>Shope for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
+                <li>Shop for books at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
             </ul>
         </li>`;
 }
@@ -53,9 +49,8 @@ function displayGoodResults(resultsArray) {
 
     $('.js-results-list').append(resultsListHtmlString);
 
-    $('.results').removeClass('hidden');
+    $('.results-section').removeClass('hidden');
 }
-
 
 
 // Logic to determine how to handle the TasteDive search results
@@ -85,22 +80,18 @@ function formatQueryParams(queryParams) {
     // Initialize empty start to queryString.
     let queryString = 'q=';
 
-    // console.log(queryParams.requestedReferences);
-
     // Add the primary search terms.
     for (let i=0 ; i<queryParams.requestedReferences.length ; i++) {
-        queryString += queryParams.requestedReferences[i].replace(/ /g, '+')+'%2C';
-        //console.log(queryString);
+        queryString += queryParams.requestedReferences[i].replace(/ /g, '%20')+'%2C';
     }
 
     queryString = queryString.slice(0,-3); //remove the final %2C
-    // console.log(queryString);
 
     // Add the info parameter to get verbose responses
     queryString += '&info=1';
 
     // Add the always-present type, callback (to get JSONP response), and key.
-    //queryString += '&type=book'
+    queryString += '&type=author'
     queryString += '&callback'
     queryString += queryParams.key
 
@@ -137,8 +128,9 @@ function getRecommendations(requestedReferencesArray) {
 }
 
 // Submit the NYTimes Books API GET request.
-function getNyTimesReviewInfo(queryTerm) {
-    console.log('Ran getNyTimesReviewInfo function.')
+function fetchNyTimesReviews(queryTerm) {
+    console.log('Ran fetchNyTimesReviews function.')
+    console.log(queryTerm);
 }
 
 // Submit the Open Library API GET request.
@@ -178,8 +170,14 @@ function watchSubmissionForm() {
 }
 
 // Set up event listener on "Show Reviews" button
-function TBD() {
-
+function watchNyTimesReviewsRequest() {
+    console.log('Ran watchNyTimesReviewsRequest function.')
+    $('.results-section').on('click','.js-book-review-button', function(event) {
+        event.preventDefault();
+        console.log('User requested NY Times reviews.');
+        const requestedFeature = $(this).val();
+        fetchNyTimesReviews(requestedFeature);
+    })
 }
 
 // Set up event listener on Reset Form
@@ -196,6 +194,8 @@ function TBD() {
 function handleLookupPage() {
     console.log('Ran handleLookupPage function.');
     watchSubmissionForm();
+    watchNyTimesReviewsRequest();
+
 }
 
 
