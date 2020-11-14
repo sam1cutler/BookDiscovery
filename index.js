@@ -1,29 +1,45 @@
 'use strict';
 
-// Define the API keys.
-const apiKey = '391102-BookReco-Z2ZG9UZJ';
+/********** Define strings for the APIs **********/
 
-// Define the base endpoint.
+// TasteDive API.
+const apiKey = '391102-BookReco-Z2ZG9UZJ';
 const baseEndpoint = 'https://tastedive.com/api/similar?';
 
+// NYTimes API
+
+
+// OpenLibrary API
+
+
+/********** TEMPLATE GENERATION FUNCTIONS **********/
 
 // Create the HTML string for each item in the results list
 function createResultsListItemString(resultObject) {
     //console.log('Ran createResultsListItemString function.')
     console.log(resultObject.Name);
 
+    // Create the string that works for both Alibris and IndieBound searches
     const searchUrlTargetString = resultObject.Name.replace(/ /g, '+');
+
+    // Do the NYTimes Books API call to get relevant reviews
+    const nyTimesReviewInfo = getNyTimesReviewInfo(resultObject.Name);
+
 
     return `
         <li>${resultObject.Name}
             <ul>
                 <li>Teaser here.</li>
+                <li>Wikipedia link here.</li>
+                <li>NYTimes book review link here.</li>
                 <li>Search for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${searchUrlTargetString}' target='_blank'>here</a>.</li>
                 <li>Search for books available at local bookstores <a href='https://www.indiebound.org/search/book?keys=${searchUrlTargetString}' target='_blank'>here</a>.</li>
             </ul>
         </li>`;
 }
 
+
+/********** RENDER FUNCTIONS **********/
 
 // Create Results List + insert into the DOM.
 function displayGoodResults(resultsArray) {
@@ -42,23 +58,24 @@ function displayGoodResults(resultsArray) {
 
 
 
-// Logic to determine how to handle the search results
+// Logic to determine how to handle the TasteDive search results
 function handleResults(responseJson) {
     console.log('Ran handleResults function.');
     console.log(responseJson);
 
-    // if don't get any results
     if (responseJson.Similar.Results.length === 0) {
-        console.log('Did not get any search results. Need to update an error message element.');
+        console.log('Did not get any search results.');
+        $('.js-error-message').html('<hr>This search did not get any results. Please try again. Tips etc.');
+        //$('.js-error-message').removeClass('hidden');
     } else {
         console.log('Got search results!');
+        $('.js-error-message').empty();
         displayGoodResults(responseJson.Similar.Results);
     }
 
-    // if do get search results
 }
 
-
+/********** API REQUEST STRING GENERATION FUNCTIONS **********/
 
 // Create the query string for the GET request.
 
@@ -90,7 +107,9 @@ function formatQueryParams(queryParams) {
     return queryString;
 }
 
-// Submit the core GET request.
+/********** API REQUEST FUNCTIONS **********/
+
+// Submit the core TasteDive API GET request.
 function getRecommendations(requestedReferencesArray) {
     console.log('Ran getRecommendations function.');
 
@@ -115,9 +134,20 @@ function getRecommendations(requestedReferencesArray) {
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
-
 }
 
+// Submit the NYTimes Books API GET request.
+function getNyTimesReviewInfo(queryTerm) {
+    console.log('Ran getNyTimesReviewInfo function.')
+}
+
+// Submit the Open Library API GET request.
+function getNyTimesReviewInfo(queryTerm) {
+    console.log('Ran getNyTimesReviewInfo function.')
+}
+
+
+/********** EVENT HANDLER FUNCTIONS **********/
 
 // Set up event listener on Submission Form
 function watchSubmissionForm() {
@@ -144,6 +174,21 @@ function watchSubmissionForm() {
         
     })
 
+
+}
+
+// Set up event listener on "Show Reviews" button
+function TBD() {
+
+}
+
+// Set up event listener on Reset Form
+function TBD() {
+
+}
+
+// Set up event listener on Tweak Same Search Form
+function TBD() {
 
 }
 
