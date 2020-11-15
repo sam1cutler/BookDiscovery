@@ -11,7 +11,7 @@ const apiKey2 = 'reKLNnPSUMVZmXe2dGGr9gAaLmAOVhGy';
 const baseNytEndpoint = 'https://api.nytimes.com/svc/books/v3/reviews.json?';
 
 // OpenLibrary API
-
+const baseOpenLibraryEndpoint = 'https://openlibrary.org/api/books?';
 
 /********** TEMPLATE GENERATION FUNCTIONS **********/
 
@@ -55,8 +55,17 @@ function displayGoodTasteDiveResults(resultsArray) {
         resultsListHtmlString += createResultsListItemString(resultsArray[i]);
     };
 
+    // Hide the TasteDive search form
+    $('.submission-section').addClass('hidden');
+
+    // Add the results list to the relevant list element + reveal it
     $('.js-results-list').append(resultsListHtmlString);
     $('.results-section').removeClass('hidden');
+
+    // Reveal the OpenLibrary lookup section
+    $('.open-library-section').removeClass('hidden');
+
+    
 }
 
 // Logic to determine how to handle the TasteDive search results
@@ -79,28 +88,38 @@ function handleTasteDiveResults(responseJson) {
 function displayNytResults(reviewResultsArray) {
     console.log('Ran displayNytResults function');
 
-    //console.log(reviewResultsArray);
-
     let nytReviewHTML = 'New York Times book reviews:<ul>';
-    //console.log(nytReviewHTML);
 
     // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
 
-    //console.log('Intend to show '+numberReviewsToShow+' results.');
-
     for (let i=0 ; i<numberReviewsToShow ; i++) {
-        //console.log(reviewResultsArray[i].url);
-        //console.log(reviewResultsArray[i].book_title);
         nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
-        //console.log(nytReviewHTML);
     };
 
     nytReviewHTML += '</ul>';
 
-    //console.log(nytReviewHTML);
-
     return nytReviewHTML;
+}
+
+// Create OpenLib results list
+function displayOpenLibResults(results, queryISBNs) {
+    console.log('Ran displayOpenLibResults function.');
+
+    console.log(results);
+
+    const ISBNcall = `${queryISBNs}`;
+
+    console.log(results[ISBNcall]);
+
+    console.log(results[ISBNcall].info_url);
+    // eventually, need to tweak to accomodate multiple results...
+
+    const openLibHTML = `<li>
+        <img src="${results[ISBNcall].thumbnail_url}" alt="open library thumbnail preview">
+        <a href=${results[ISBNcall].info_url} target="_blank">${results[ISBNcall].info_url}</a></li>`;
+
+    return openLibHTML;
 }
 
 
@@ -119,6 +138,24 @@ function handleNytResults(responseJson,identifyingString) {
     
     $('.js-reviews-target').html(nytReviewHTML);
     $('.js-reviews-target').removeClass('hidden');
+}
+
+// Handle OpenLibrary API search results
+function handleOpenLibraryResults(responseJson, queryISBNs) {
+    console.log('Ran handleOpenLibraryResults function.');
+
+    console.log(responseJson);
+
+    let openLibHTML = ''
+
+    if (responseJson.length === 0) {
+        openLibHTML = 'Sorry, could not find relevant search results. Please check the ISBN number[s].';
+    } else {
+        openLibHTML = displayOpenLibResults(responseJson, queryISBNs);
+    };
+
+    $('.open-library-results-list').html(openLibHTML);
+    $('.open-library-results').removeClass('hidden');
 }
 
 /********** API REQUEST STRING GENERATION FUNCTIONS **********/
@@ -168,12 +205,22 @@ function formatNytQueryParams(queryParams) {
     const queryString = searchType+coreQuery+'&api-key='+queryParams.key;
 
     return queryString;
+}
+
+function formatOpenLibQueryParams(queryParams) {
+    console.log('Ran formatOpenLibQueryParams function.');
+
+    // Eventually, this should iterate through list items in query array...
+
+    const queryString = `bibkeys=${queryParams}&format=json`;
+
+    return queryString;
 
 }
 
 /********** API REQUEST FUNCTIONS **********/
 
-// Submit the core TasteDive API GET request.
+// Submit the TasteDive API GET request.
 function getRecommendations(requestedReferencesArray) {
     console.log('Ran getRecommendations function.');
 
@@ -209,7 +256,7 @@ function fetchNyTimesReviews(queryTerm) {
     const params = {
         key: apiKey2,
         requestedReference: queryTerm
-    }
+    };
 
     const queryString = formatNytQueryParams(params);
     const URLtoBeFetched = baseNytEndpoint+queryString;
@@ -232,9 +279,30 @@ function fetchNyTimesReviews(queryTerm) {
 }
 
 // Submit the Open Library API GET request.
-function getNyTimesReviewInfo(queryTerm) {
-    console.log('Ran getNyTimesReviewInfo function.')
+function fetchOpenLibraryBooks(queryISBNs) {
+    console.log('Ran fetchOpenLIbraryBooks function.');
+    console.log('Need to look up the ISBN '+queryISBNs);
+
+    const queryString = formatOpenLibQueryParams(queryISBNs);
+    const URLtoBeFetched = baseOpenLibraryEndpoint+queryString;
+
+    console.log(URLtoBeFetched);
+
+    fetch(URLtoBeFetched)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+                //console.log(response.json());
+            }
+            throw new Error(response.statusText);
+        })
+        .then(responseJson => handleOpenLibraryResults(responseJson, queryISBNs))
+        //.then(responseJson => console.log(responseJson))
+        .catch(err => {
+            $('#js-error-message').text(`Something went wrong: ${err.message}`);
+        });
 }
+
 
 
 /********** EVENT HANDLER FUNCTIONS **********/
@@ -243,7 +311,7 @@ function getNyTimesReviewInfo(queryTerm) {
 function watchSubmissionForm() {
     console.log('Ran watchForm function.');
 
-    $('main').on('submit','.submission-form', function(event) {
+    $('.submission-section').on('submit','.submission-form', function(event) {
         event.preventDefault();
         console.log('The submission form was submitted.');
 
@@ -260,11 +328,8 @@ function watchSubmissionForm() {
         console.log('The user has requested recommendations based on:');
         console.log(requestArray);
 
-        getRecommendations(requestArray);
-        
+        getRecommendations(requestArray);  
     })
-
-
 }
 
 // Set up event listener on "Show Reviews" button
@@ -277,6 +342,20 @@ function watchNyTimesReviewsRequest() {
         fetchNyTimesReviews(requestedFeature);
     })
 }
+
+// Set up event listener on Open Library Search Form
+function watchOpenLibraryRequest() {
+    console.log('Ran watchOpenLibraryRequest function');
+
+    $('.open-library-section').on('submit','.open-library-form', function(event) {
+        event.preventDefault();
+        console.log('User requested ISBN lookup on Open Library.');
+        
+        const requestedISBN = $('#js-isbn-field1').val();
+        fetchOpenLibraryBooks(requestedISBN);
+    })
+}
+
 
 // Set up event listener on Reset Form
 function TBD() {
@@ -293,6 +372,7 @@ function handleLookupPage() {
     console.log('Ran handleLookupPage function.');
     watchSubmissionForm();
     watchNyTimesReviewsRequest();
+    watchOpenLibraryRequest();
 
 }
 

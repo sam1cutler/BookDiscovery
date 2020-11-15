@@ -25,8 +25,10 @@
       <h3>This app will provide author recommendations based on any combination of artists or pieces of art.</h3>
     </section>
 
+    <hr>
+
     <section class='submission-section'>
-      <h3>Enter at least 1, and as many as 4, books/authors/musicians/albums/TV shows/movies - anything you like!</h3>
+      <h3>Enter at least 1, and as many as 3, books/authors/musicians/albums/TV shows/movies - anything you like!</h3>
       <p>Eventually, will include some "guidance" to help facilitate more-successful searches.</p>
 
       <form class='submission-form'>
@@ -46,6 +48,24 @@
 
         <button type="submit">Find my recommendations!</button>
       </form>
+    </section>
+
+    <section class="open-library-section hidden">
+      <h4>Did you find any specific books you're interested in? They might be freely available online at Open Library. To search, enter the ISBNs for any books you've found.</h3>
+
+      <form class='open-library-form'>
+        <div class='submission-field'>
+          <label for="js-isbn-field1">Book 1:</label>
+            <input type="text" name="js-isbn-field1" id="js-isbn-field1"></input>
+        </div><br>
+        <button type="submit">Find Open Library books!</button>
+      </form>
+
+      <div class="open-library-results hidden">
+        <h4>Here are the search results:</h4>
+        <ul class="open-library-results-list"></ul>
+      </div>
+
     </section>
 
     <section class='results-section hidden'>
