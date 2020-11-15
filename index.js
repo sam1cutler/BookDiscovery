@@ -3,22 +3,27 @@
 /********** Define strings for the APIs **********/
 
 // TasteDive API.
-const apiKey = '391102-BookReco-Z2ZG9UZJ';
-const baseEndpoint = 'https://tastedive.com/api/similar?';
+const apiKey1 = '391102-BookReco-Z2ZG9UZJ';
+const baseTasteDiveEndpoint = 'https://tastedive.com/api/similar?';
 
 // NYTimes API
-
+const apiKey2 = 'reKLNnPSUMVZmXe2dGGr9gAaLmAOVhGy';
+const baseNytEndpoint = 'https://api.nytimes.com/svc/books/v3/reviews.json?';
 
 // OpenLibrary API
 
 
 /********** TEMPLATE GENERATION FUNCTIONS **********/
 
-// Create the HTML string for each item in the results list
+// Create the HTML string for each item in the TasteDive results list
 function createResultsListItemString(resultObject) {
 
     // Create a shorthand name replacing spaces with plus signs
     const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
+    
+    // Create a value for each button, to facilitate NY Times API query.
+    const buttonValue = resultHitShorthand+`|type=${resultObject.Type[0]}`;
+    console.log(buttonValue);
 
     // TO-DO: need to incorporate the type (author or book) into the button value to make the NYTimes API call work.
 
@@ -26,20 +31,23 @@ function createResultsListItemString(resultObject) {
         <li>${resultObject.Name}
             <ul>
                 <li>${resultObject.wTeaser}</li>
-                <li><a href='${resultObject.wURL}'>Click here for the full Wikipedia page</a>.</li>
-                <li><button type="button" class='js-book-review-button' value='${resultHitShorthand}'>Click here to find a relevant New York Times book review.</button></li>
-                <li>Shope for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
-                <li>Shop for books at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
+                <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>
+                <li><button type="button" class='js-book-review-button' value='${buttonValue}'>Click here to search for relevant New York Times book reviews.</button></li>
+                <li class='js-reviews-target hidden'></li>
+                <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
+                <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
             </ul>
         </li>`;
 }
 
+// Create the HTML for NYTimes review links:
+
 
 /********** RENDER FUNCTIONS **********/
 
-// Create Results List + insert into the DOM.
-function displayGoodResults(resultsArray) {
-    console.log('Ran displayGoodResults function.');
+// Create TasteDive Results List + insert into the DOM.
+function displayGoodTasteDiveResults(resultsArray) {
+    console.log('Ran displayGoodTasteDiveResults function.');
 
     let resultsListHtmlString = '';
 
@@ -48,34 +56,77 @@ function displayGoodResults(resultsArray) {
     };
 
     $('.js-results-list').append(resultsListHtmlString);
-
     $('.results-section').removeClass('hidden');
 }
 
-
 // Logic to determine how to handle the TasteDive search results
-function handleResults(responseJson) {
-    console.log('Ran handleResults function.');
+function handleTasteDiveResults(responseJson) {
+    console.log('Ran handleTasteDiveResults function.');
     console.log(responseJson);
 
     if (responseJson.Similar.Results.length === 0) {
         console.log('Did not get any search results.');
-        $('.js-error-message').html('<hr>This search did not get any results. Please try again. Tips etc.');
+        $('.js-error-message').html('<hr><h4>This search did not get any results. Please try again. Tips etc.</h4>');
         //$('.js-error-message').removeClass('hidden');
     } else {
         console.log('Got search results!');
         $('.js-error-message').empty();
-        displayGoodResults(responseJson.Similar.Results);
-    }
+        displayGoodTasteDiveResults(responseJson.Similar.Results);
+    };
+}
 
+// Create NYT reviews results list
+function displayNytResults(reviewResultsArray) {
+    console.log('Ran displayNytResults function');
+
+    //console.log(reviewResultsArray);
+
+    let nytReviewHTML = 'New York Times book reviews:<ul>';
+    //console.log(nytReviewHTML);
+
+    // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
+    const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
+
+    //console.log('Intend to show '+numberReviewsToShow+' results.');
+
+    for (let i=0 ; i<numberReviewsToShow ; i++) {
+        //console.log(reviewResultsArray[i].url);
+        //console.log(reviewResultsArray[i].book_title);
+        nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
+        //console.log(nytReviewHTML);
+    };
+
+    nytReviewHTML += '</ul>';
+
+    //console.log(nytReviewHTML);
+
+    return nytReviewHTML;
+}
+
+
+// Handle NYTimes Books API search results
+function handleNytResults(responseJson,identifyingString) {
+    console.log('Ran handleNytResults function.');
+    console.log(responseJson);
+
+    let nytReviewHTML = ''
+
+    if (responseJson.results.length === 0) {
+        nytReviewHTML = 'Sorry, could not find any relevant reviews.';
+    } else {
+        nytReviewHTML = displayNytResults(responseJson.results);
+    };
+    
+    $('.js-reviews-target').html(nytReviewHTML);
+    $('.js-reviews-target').removeClass('hidden');
 }
 
 /********** API REQUEST STRING GENERATION FUNCTIONS **********/
 
 // Create the query string for the GET request.
 
-function formatQueryParams(queryParams) {
-    console.log('Ran formatQueryParams function.')
+function formatTasteDiveQueryParams(queryParams) {
+    console.log('Ran formatTasteDiveQueryParams function.')
 
     // Initialize empty start to queryString.
     let queryString = 'q=';
@@ -90,12 +141,34 @@ function formatQueryParams(queryParams) {
     // Add the info parameter to get verbose responses
     queryString += '&info=1';
 
-    // Add the always-present type, callback (to get JSONP response), and key.
-    queryString += '&type=author'
-    queryString += '&callback'
-    queryString += queryParams.key
+    // Add additional query parameters: 
+    queryString += '&type=author';   // => specify types in response (this doesn't seem to actually work as claimed, probably remove eventually)
+    queryString += '&callback';      // => specify JSONP format
+    //queryString += '&limit=5';       // => add limit to # of search results (seems to mess up CORB requirement?)
+    queryString += queryParams.key;  // => add the API key
 
     return queryString;
+}
+
+function formatNytQueryParams(queryParams) {
+    console.log('Ran formatNytQueryParams function.');
+
+    // true query term omits the end-of-the-string tag for author/title type
+    const coreQuery = queryParams.requestedReference.slice(0,-7);
+    console.log(coreQuery);
+
+    // Determine whether searching for an author or title
+    let searchType = '';
+    if (queryParams.requestedReference.slice(-1) === 'a') {
+        searchType = 'author=';
+    } else if (queryParams.requestedReference.slice(-1) === 'b') {
+        searchType = 'title=';
+    };
+
+    const queryString = searchType+coreQuery+'&api-key='+queryParams.key;
+
+    return queryString;
+
 }
 
 /********** API REQUEST FUNCTIONS **********/
@@ -105,12 +178,12 @@ function getRecommendations(requestedReferencesArray) {
     console.log('Ran getRecommendations function.');
 
     const params = {
-        key: apiKey,
+        key: apiKey1,
         requestedReferences: requestedReferencesArray,
     };
 
-    const queryString = formatQueryParams(params);
-    const URLtoBeFetched = baseEndpoint+queryString;
+    const queryString = formatTasteDiveQueryParams(params);
+    const URLtoBeFetched = baseTasteDiveEndpoint+queryString;
     console.log(URLtoBeFetched);
 
     fetchJsonp(URLtoBeFetched)
@@ -121,7 +194,8 @@ function getRecommendations(requestedReferencesArray) {
             }
             throw new Error(response.statusText);
         })
-        .then(responseJson => handleResults(responseJson))
+        .then(responseJson => handleTasteDiveResults(responseJson))
+        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
@@ -131,6 +205,30 @@ function getRecommendations(requestedReferencesArray) {
 function fetchNyTimesReviews(queryTerm) {
     console.log('Ran fetchNyTimesReviews function.')
     console.log(queryTerm);
+
+    const params = {
+        key: apiKey2,
+        requestedReference: queryTerm
+    }
+
+    const queryString = formatNytQueryParams(params);
+    const URLtoBeFetched = baseNytEndpoint+queryString;
+    
+    console.log(URLtoBeFetched);
+
+    fetch(URLtoBeFetched)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+                //console.log(response.json());
+            }
+            throw new Error(response.statusText);
+        })
+        .then(responseJson => handleNytResults(responseJson, queryTerm))
+        //.then(responseJson => console.log(responseJson))
+        .catch(err => {
+            $('#js-error-message').text(`Something went wrong: ${err.message}`);
+        });
 }
 
 // Submit the Open Library API GET request.
