@@ -20,6 +20,7 @@ function createResultsListItemString(resultObject) {
 
     // Create a shorthand name replacing spaces with plus signs
     const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
+    const targetID = resultObject.Name.replace(/ /g, '-')
     
     // Create a value for each button, to facilitate NY Times API query.
     const buttonValue = resultHitShorthand+`|type=${resultObject.Type[0]}`;
@@ -32,8 +33,8 @@ function createResultsListItemString(resultObject) {
             <ul>
                 <li>${resultObject.wTeaser}</li>
                 <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>
-                <li><button type="button" class='js-book-review-button' value='${buttonValue}'>Click here to search for relevant New York Times book reviews.</button></li>
-                <li class='js-reviews-target hidden'></li>
+                <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${buttonValue}'>Click here to search for relevant New York Times book reviews.</button></li>
+                <li id='js-reviews-target-${targetID}' class='hidden'></li>
                 <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
                 <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
             </ul>
@@ -127,6 +128,11 @@ function displayOpenLibResults(results, queryISBNs) {
 function handleNytResults(responseJson,identifyingString) {
     console.log('Ran handleNytResults function.');
     console.log(responseJson);
+    console.log(identifyingString);
+    const reviewTargetID1 = identifyingString.slice(0,-7)
+    console.log(reviewTargetID1);
+    const reviewTargetID2 = reviewTargetID1.replace('+', '-');
+    console.log(reviewTargetID2);
 
     let nytReviewHTML = ''
 
@@ -136,8 +142,12 @@ function handleNytResults(responseJson,identifyingString) {
         nytReviewHTML = displayNytResults(responseJson.results);
     };
     
-    $('.js-reviews-target').html(nytReviewHTML);
-    $('.js-reviews-target').removeClass('hidden');
+    // Fill in reviews list and reveal the DOM element
+    $(`#js-reviews-target-${reviewTargetID2}`).html(nytReviewHTML);
+    $(`#js-reviews-target-${reviewTargetID2}`).removeClass('hidden');
+
+    // Hide the "search" button
+    $(`#js-reviews-button-${reviewTargetID2}`).addClass('hidden');
 }
 
 // Handle OpenLibrary API search results
