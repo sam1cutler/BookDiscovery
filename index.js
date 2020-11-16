@@ -63,8 +63,9 @@ function displayGoodTasteDiveResults(resultsArray) {
     $('.js-results-list').append(resultsListHtmlString);
     $('.results-section').removeClass('hidden');
 
-    // Reveal the OpenLibrary lookup section
+    // Reveal the OpenLibrary lookup section and restart buttons section
     $('.open-library-section').removeClass('hidden');
+    $('.restart-buttons-section').removeClass('hidden');
 
     
 }
@@ -127,12 +128,8 @@ function displayOpenLibResults(results, queryISBNs) {
 // Handle NYTimes Books API search results
 function handleNytResults(responseJson,identifyingString) {
     console.log('Ran handleNytResults function.');
-    console.log(responseJson);
-    console.log(identifyingString);
-    const reviewTargetID1 = identifyingString.slice(0,-7)
-    console.log(reviewTargetID1);
-    const reviewTargetID2 = reviewTargetID1.replace('+', '-');
-    console.log(reviewTargetID2);
+
+    const reviewTargetID = identifyingString.slice(0,-7).replace(/\+/g, '-');
 
     let nytReviewHTML = ''
 
@@ -143,11 +140,11 @@ function handleNytResults(responseJson,identifyingString) {
     };
     
     // Fill in reviews list and reveal the DOM element
-    $(`#js-reviews-target-${reviewTargetID2}`).html(nytReviewHTML);
-    $(`#js-reviews-target-${reviewTargetID2}`).removeClass('hidden');
+    $(`#js-reviews-target-${reviewTargetID}`).html(nytReviewHTML);
+    $(`#js-reviews-target-${reviewTargetID}`).removeClass('hidden');
 
     // Hide the "search" button
-    $(`#js-reviews-button-${reviewTargetID2}`).addClass('hidden');
+    $(`#js-reviews-button-${reviewTargetID}`).addClass('hidden');
 }
 
 // Handle OpenLibrary API search results
@@ -166,6 +163,26 @@ function handleOpenLibraryResults(responseJson, queryISBNs) {
 
     $('.open-library-results-list').html(openLibHTML);
     $('.open-library-results').removeClass('hidden');
+}
+
+// Handle clicks of the reset search form button
+function handleResetForm() {
+    console.log('Ran handleResetForm function');
+
+    // Empty contents of the results list and hide the results section
+    $('.js-results-list').empty();
+    $('.results-section').addClass('hidden');
+
+    // Empty contents of the search fields and reveal search section.
+        // empty contents after finalizing search field structure
+    $('.submission-section').removeClass('hidden');
+
+    // Empty contents of and hide the Open Library section
+        // empty contents after finalizing search field structure
+    $('.open-library-section').addClass('hidden');
+
+    // Hide the reset buttons section
+    $('.restart-buttons-section').addClass('hidden');
 }
 
 /********** API REQUEST STRING GENERATION FUNCTIONS **********/
@@ -368,13 +385,18 @@ function watchOpenLibraryRequest() {
 
 
 // Set up event listener on Reset Form
-function TBD() {
+function watchResetForm() {
+    console.log('Ran watchResetForm function.')
 
+    $('.fresh-search').on('click', function(event) {
+        console.log('User requested to reset the search form.');
+        handleResetForm();
+    })
 }
 
 // Set up event listener on Tweak Same Search Form
-function TBD() {
-
+function watchTweakSearchForm() {
+    console.log('Ran watchTweakSearchForm function.')
 }
 
 // Run the event-listener-setup function
@@ -383,6 +405,8 @@ function handleLookupPage() {
     watchSubmissionForm();
     watchNyTimesReviewsRequest();
     watchOpenLibraryRequest();
+    watchResetForm();
+    watchTweakSearchForm();
 
 }
 
