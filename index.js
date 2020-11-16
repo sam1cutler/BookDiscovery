@@ -93,10 +93,16 @@ function displayNytResults(reviewResultsArray) {
     // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
 
+    console.log(numberReviewsToShow);
+
     for (let i=0 ; i<numberReviewsToShow ; i++) {
+        console.log(reviewResultsArray[i]);
+        console.log(reviewResultsArray[i].url);
+        console.log(reviewResultsArray[i].book_title);
         nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
     };
 
+    console.log(nytReviewHTML);
     nytReviewHTML += '</ul>';
 
     return nytReviewHTML;
@@ -126,6 +132,8 @@ function displayOpenLibResults(results, queryISBNs) {
 // Handle NYTimes Books API search results
 function handleNytResults(responseJson,identifyingString) {
     console.log('Ran handleNytResults function.');
+
+    console.log(responseJson.results);
 
     const reviewTargetID = identifyingString.slice(0,-7).replace(/\+/g, '-');
 
@@ -171,12 +179,13 @@ function handleResetForm() {
     $('.js-results-list').empty();
     $('.results-section').addClass('hidden');
 
-    // Empty contents of the search fields and reveal search section.
-        // empty contents after finalizing search field structure
+    // Empty contents of the search fields, and reveal search section and search tips div.
+    $('#tastedive-search-field').val('');
     $('.submission-section').removeClass('hidden');
+    $('.search-tips-div').removeClass('hidden');
 
     // Empty contents of and hide the Open Library section
-        // empty contents after finalizing search field structure
+    $('#js-isbn-field').val('');
     $('.open-library-section').addClass('hidden');
 
     // Hide the reset buttons section
@@ -423,7 +432,7 @@ function watchOpenLibraryRequest() {
         event.preventDefault();
         console.log('User requested ISBN lookup on Open Library.');
         
-        const requestedISBN = $('#js-isbn-field1').val();
+        const requestedISBN = $('#js-isbn-field').val();
         fetchOpenLibraryBooks(requestedISBN);
     })
 }
@@ -439,11 +448,6 @@ function watchResetForm() {
     })
 }
 
-// Set up event listener on Tweak Same Search Form
-function watchTweakSearchForm() {
-    console.log('Ran watchTweakSearchForm function.')
-}
-
 // Run the event-listener-setup function
 function handleLookupPage() {
     console.log('Ran handleLookupPage function.');
@@ -451,7 +455,6 @@ function handleLookupPage() {
     watchNyTimesReviewsRequest();
     watchOpenLibraryRequest();
     watchResetForm();
-    watchTweakSearchForm();
 }
 
 

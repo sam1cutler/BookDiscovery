@@ -21,55 +21,44 @@
 
     <hr>
 
-    <section class='summary-explanation hidden'>
-      <h3>This app will provide book and author recommendations.</h3>
-    </section>
-
     <section class='submission-section'>
       <h3>Search for recommendations based on a book title or author name.</h3>
-      <p>Eventually, will include some "guidance" to help facilitate more-successful searches. Maybe only provide guidance on form reset?</p>
+      
+      <div class='search-tips-div hidden'>
+        <p><i>A couple tips to make your searches more effective:</i></p>
+        <ul>
+          <li>Using an author's full name (first and last) is likely to give better results.</li>
+          <li>If you don't find a review of a specific book, searching for that author is more likely to find a book review.</li>
+        </ul>
+      </div>
 
       <form class='tastedive-search-form'>
+        <!-- primary search field -->
         <label for="tastedive-search-field">Book/Author:</label>
           <input type="text" name='tastedive-search-field' id='tastedive-search-field' required></input>
         
+        <!-- dropdown menu for book/author -->
         <select class='tastedive-search-type' size="1">
           <option value="book">Book</option>
           <option value="author">Author</option>
         </select><br>
         
+        <!-- form submission button -->
         <button type="submit">Find my recommendations!</button>
       </form>
 
-      <form class='submission-form hidden'>
-        
-        <div class='submission-field'>
-          <label for="js-search-field1">Thing 1:</label>
-            <input type="text" name="js-search-field1" id="js-search-field1" required></input>
-        </div><br>
-        <div class='submission-field'>
-          <label for="js-search-field2">Thing 2:</label>
-            <input type="text" name="js-search-field2" id="js-search-field2"></input><br>
-        </div><br>
-        <div class='submission-field'>
-          <label for="js-search-field3">Thing 3:</label>
-          <input type="text" name="js-search-field3" id="js-search-field3"></input><br>
-        </div><br>
-
-        <button type="submit">Find my recommendations!</button>
-      </form>
     </section>
 
 
     <section class="open-library-section hidden">
-      <h4>Did you find any specific books you're interested in? They might be freely available online at Open Library. To search, enter the ISBNs for any books you've found.</h3>
+      <h4>Did you find a specific book you're interested in? It might be freely available online at Open Library! To search, enter the <a href='https://en.wikipedia.org/wiki/International_Standard_Book_Number' target='_blank'>ISBN</a> for your book of interest.</h3>
 
       <form class='open-library-form'>
         <div class='submission-field'>
-          <label for="js-isbn-field1">Book 1:</label>
-            <input type="text" name="js-isbn-field1" id="js-isbn-field1"></input>
+          <label for="js-isbn-field1">ISBN:</label>
+            <input type="text" name="js-isbn-field" id="js-isbn-field"></input>
         </div><br>
-        <button type="submit">Find Open Library books!</button>
+        <button type="submit">Find an Open Library book!</button>
       </form>
 
       <div class="open-library-results hidden">
@@ -82,7 +71,6 @@
     <section class='restart-buttons-section hidden'>
       <hr>
       <button class='fresh-search' type='click'>Try a fresh search.</button>
-      <button class='tweak-search' type='click'>Modify search.</button>    
     </section>
 
     <section class='results-section hidden'>
@@ -96,7 +84,10 @@
     <hr>
 
     <footer>
-      <h4>This tool uses the <a href='https://tastedive.com/read/api' target='_blank'>TasteDive API</a>.</h4>
+      <h4>This tool uses the 
+        <a href='https://tastedive.com/read/api' target='_blank'>TasteDive API to create the recommendation lists,</a> 
+        the <a href="https://developer.nytimes.com/docs/books-product/1/overview" target='_blank'>New York Times Books API</a> to find NYTimes book reviews, and
+        the <a href="https://openlibrary.org/dev/docs/api/books" target='_blank'>Open Library API</a> to search for free online rentals.</h4>
     </footer>
 
   </main>
