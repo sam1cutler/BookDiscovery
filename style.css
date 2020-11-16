@@ -28,7 +28,7 @@ button, input[type="text"] {
   margin-top: 20px;
 }
 
-#js-error-message {
+.js-error-message {
   color: red;
   font-size: 20px;
 }

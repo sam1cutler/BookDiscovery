@@ -179,7 +179,7 @@ function handleResetForm() {
     $('.js-results-list').empty();
     $('.results-section').addClass('hidden');
 
-    // Empty contents of the search fields, and reveal search section and search tips div.
+    // Empty contents of the Tastedive search field, and reveal search section and search tips div.
     $('#tastedive-search-field').val('');
     $('.submission-section').removeClass('hidden');
     $('.search-tips-div').removeClass('hidden');
@@ -187,6 +187,10 @@ function handleResetForm() {
     // Empty contents of and hide the Open Library section
     $('#js-isbn-field').val('');
     $('.open-library-section').addClass('hidden');
+
+    // Empty Open Library search results and hide its section
+    $('.open-library-results-list').empty();
+    $('.open-library-results').addClass('hidden');
 
     // Hide the reset buttons section
     $('.restart-buttons-section').addClass('hidden');
