@@ -26,10 +26,22 @@
     </section>
 
     <section class='submission-section'>
-      <h3>Enter at least 1, and as many as 3, books/authors/musicians/albums/TV shows/movies - anything you like!</h3>
-      <p>Eventually, will include some "guidance" to help facilitate more-successful searches.</p>
+      <h3>Search for recommendations based on a book title or author name.</h3>
+      <p>Eventually, will include some "guidance" to help facilitate more-successful searches. Maybe only provide guidance on form reset?</p>
 
-      <form class='submission-form'>
+      <form class='tastedive-search-form'>
+        <label for="tastedive-search-field">Book/Author:</label>
+          <input type="text" name='tastedive-search-field' id='tastedive-search-field' required></input>
+        
+        <select class='tastedive-search-type' size="1">
+          <option value="book">Book</option>
+          <option value="author">Author</option>
+        </select><br>
+        
+        <button type="submit">Find my recommendations!</button>
+      </form>
+
+      <form class='submission-form hidden'>
         
         <div class='submission-field'>
           <label for="js-search-field1">Thing 1:</label>
