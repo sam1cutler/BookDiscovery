@@ -22,10 +22,12 @@ let tastediveResultsSimpleList = {};
 // string that will be set to either "author" or "book" when the search is submitted
 let tastediveSearchType = '';
 
+
+
 /********** TEMPLATE GENERATION FUNCTIONS **********/
 
 // Create the HTML string for each item in the TasteDive results list
-function createResultsListItemString(resultObject,i) {
+function createResultsListItemString(resultObject,i,summaryInfo) {
 
     // Create a shorthand name replacing spaces with plus signs, for Alibris/Indiebound URLs
     const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
@@ -39,8 +41,7 @@ function createResultsListItemString(resultObject,i) {
     return `
         <li>${resultObject.Name}
             <ul>
-                <li>${resultObject.wTeaser}</li>
-                <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>
+                ${summaryInfo}
                 <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button></li>
                 <li id='js-reviews-target-${targetID}' class='hidden'></li>
                 <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
@@ -49,33 +50,24 @@ function createResultsListItemString(resultObject,i) {
         </li>`;
 }
 
+// Create the HTML string containing Wiki teaser + link, if available from Tastedive results
+function createGoodResultsListItemString(resultObject) {
+    //console.log('Ran createGoodResultsListItemString function.');
 
-// I know I should better-functionalize these... TBD (or not)...
-function createSparseResultsListItemString(resultObject,i) {
-    
-    // Create a shorthand name replacing spaces with plus signs, for Alibris/Indiebound URLs
-    const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
+    return `
+    <li>${resultObject.wTeaser}</li>
+    <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>`;
+}
 
-    // Create a "targetID" for to link the "request for reviews" button to  
-    const targetID = `tasteDiveResult-${i}`;
-
-    // Add an object (key:value targetID:searchResultName) to master resultsList
-    tastediveResultsSimpleList[targetID] = resultObject.Name;
+// Create the HTML string containing "no teaser" message + formatted Google search, if Wiki info UNavailable from Tastedive results
+function createSparseResultsSummary(resultObject) {
+    //console.log('Ran createSparseResultsSummary function.');
 
     // Create a Google search URL
     const googleSearchQuery = encodeURIComponent(resultObject.Name);
     const googleSearchUrl = 'https://www.google.com/search?q='+googleSearchQuery;
-
-    return `
-        <li>${resultObject.Name}
-            <ul>
-                <li>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</li>
-                <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button></li>
-                <li id='js-reviews-target-${targetID}' class='hidden'></li>
-                <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
-                <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
-            </ul>
-        </li>`;
+    
+    return `<li>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</li>`;
 }
 
 
@@ -92,13 +84,18 @@ function displayGoodTasteDiveResults(resultsArray, searchTermName) {
     // Create the HTML string containing the results list
     let resultsListHtmlString = '';
 
-    // Determine whether there is a Wikipedia link / summary for the search result
     for (let i=0 ; i<resultsArray.length ; i++) {
+
+        // Initialize empty "summary info" string
+        let summaryInfoHtml = '';
+
+        // Determine whether there is a Wikipedia link / summary for the search result
         if (!resultsArray[i].wUrl) {
-            resultsListHtmlString += createSparseResultsListItemString(resultsArray[i],i);
+            summaryInfoHtml = createSparseResultsSummary(resultsArray[i]);
         } else {
-            resultsListHtmlString += createResultsListItemString(resultsArray[i],i);
+            summaryInfoHtml = createGoodResultsListItemString(resultsArray[i]);
         }
+        resultsListHtmlString += createResultsListItemString(resultsArray[i],i,summaryInfoHtml);
     };
 
     // Hide the TasteDive search form and (in case it had been revealed) "tips" section
@@ -431,4 +428,4 @@ function handleLookupPage() {
     watchResetForm();
 }
 
-$(handleLookupPage)
+$(handleLookupPage);
