@@ -93,8 +93,6 @@ function displayNytResults(reviewResultsArray) {
     // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
 
-    console.log(numberReviewsToShow);
-
     for (let i=0 ; i<numberReviewsToShow ; i++) {
         console.log(reviewResultsArray[i]);
         console.log(reviewResultsArray[i].url);
@@ -102,7 +100,6 @@ function displayNytResults(reviewResultsArray) {
         nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
     };
 
-    console.log(nytReviewHTML);
     nytReviewHTML += '</ul>';
 
     return nytReviewHTML;
@@ -112,14 +109,7 @@ function displayNytResults(reviewResultsArray) {
 function displayOpenLibResults(results, queryISBNs) {
     console.log('Ran displayOpenLibResults function.');
 
-    console.log(results);
-
     const ISBNcall = `${queryISBNs}`;
-
-    console.log(results[ISBNcall]);
-
-    console.log(results[ISBNcall].info_url);
-    // eventually, need to tweak to accomodate multiple results...
 
     const openLibHTML = `<li>
         <img src="${results[ISBNcall].thumbnail_url}" alt="open library thumbnail preview">
@@ -133,7 +123,7 @@ function displayOpenLibResults(results, queryISBNs) {
 function handleNytResults(responseJson,identifyingString) {
     console.log('Ran handleNytResults function.');
 
-    console.log(responseJson.results);
+    console.log(responseJson);
 
     const reviewTargetID = identifyingString.slice(0,-7).replace(/\+/g, '-');
 
@@ -156,8 +146,6 @@ function handleNytResults(responseJson,identifyingString) {
 // Handle OpenLibrary API search results
 function handleOpenLibraryResults(responseJson, queryISBNs) {
     console.log('Ran handleOpenLibraryResults function.');
-
-    console.log(responseJson);
 
     let openLibHTML = ''
 
@@ -196,6 +184,7 @@ function handleResetForm() {
     $('.restart-buttons-section').addClass('hidden');
 }
 
+
 /********** API REQUEST STRING GENERATION FUNCTIONS **********/
 
 // Create the query string for the GET request.
@@ -221,8 +210,6 @@ function formatTasteDiveQueryParams(queryParams) {
     //queryString += '&limit=5';       // => add limit to # of search results (seems to mess up CORB requirement?)
     queryString += queryParams.key;  // => add the API key
 
-    console.log(queryString);
-
     return queryString;
 }
 
@@ -231,7 +218,8 @@ function formatNytQueryParams(queryParams) {
 
     // true query term omits the end-of-the-string tag for author/title type
     const coreQuery = queryParams.requestedReference.slice(0,-7);
-    console.log(coreQuery);
+
+    
 
     // Determine whether searching for an author or title
     let searchType = '';
@@ -249,12 +237,9 @@ function formatNytQueryParams(queryParams) {
 function formatOpenLibQueryParams(queryParams) {
     console.log('Ran formatOpenLibQueryParams function.');
 
-    // Eventually, this should iterate through list items in query array...
-
     const queryString = `bibkeys=${queryParams}&format=json`;
 
     return queryString;
-
 }
 
 /********** API REQUEST FUNCTIONS **********/
@@ -282,35 +267,6 @@ function getTastediveRecommendations(searchTerm, searchType) {
             throw new Error(response.statusText);
         })
         .then(responseJson => handleTasteDiveResults(responseJson))
-        //.then(responseJson => console.log(responseJson))
-        .catch(err => {
-            $('#js-error-message').text(`Something went wrong: ${err.message}`);
-        });
-}
-
-// Submit the TasteDive API GET request. [OLD VERSION TO BE ELIMINATED]
-function getRecommendations(requestedReferencesArray) {
-    console.log('Ran getRecommendations function.');
-
-    const params = {
-        key: apiKey1,
-        requestedReferences: requestedReferencesArray,
-    };
-
-    const queryString = formatTasteDiveQueryParams(params);
-    const URLtoBeFetched = baseTasteDiveEndpoint+queryString;
-    console.log(URLtoBeFetched);
-
-    fetchJsonp(URLtoBeFetched)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-                //console.log(response.json());
-            }
-            throw new Error(response.statusText);
-        })
-        .then(responseJson => handleTasteDiveResults(responseJson))
-        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
@@ -340,7 +296,6 @@ function fetchNyTimesReviews(queryTerm) {
             throw new Error(response.statusText);
         })
         .then(responseJson => handleNytResults(responseJson, queryTerm))
-        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
@@ -365,17 +320,14 @@ function fetchOpenLibraryBooks(queryISBNs) {
             throw new Error(response.statusText);
         })
         .then(responseJson => handleOpenLibraryResults(responseJson, queryISBNs))
-        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
 }
 
-
-
 /********** EVENT HANDLER FUNCTIONS **********/
 
-//
+// Set up event listener on primary submission form
 function watchTastediveSearchForm() {
     console.log('Ran watchTastediveSearchForm.')
 
@@ -387,37 +339,10 @@ function watchTastediveSearchForm() {
         const searchType = $('.tastedive-search-type').val();
 
         getTastediveRecommendations(searchTerm, searchType);
-
-    })
-
-}
-
-// Set up event listener on Submission Form
-function watchSubmissionForm() {
-    console.log('Ran watchForm function.');
-
-    $('.submission-section').on('submit','.submission-form', function(event) {
-        event.preventDefault();
-        console.log('The submission form was submitted.');
-
-        // Store data from form submission in an array.
-        let requestArray = [];
-        
-        // *** note: eventually want a more elegant / generalized solution to "how many references did user submit?"
-        for (let i=1 ; i<4 ; i++) {
-            if ( $(`#js-search-field${i}`).val() != '' ) {
-                requestArray.push( $(`#js-search-field${i}`).val().toLowerCase() );
-            }
-        }
-        
-        console.log('The user has requested recommendations based on:');
-        console.log(requestArray);
-
-        getRecommendations(requestArray);  
     })
 }
 
-// Set up event listener on "Show Reviews" button
+// Set up event listener on "Show NYT Reviews" button
 function watchNyTimesReviewsRequest() {
     console.log('Ran watchNyTimesReviewsRequest function.')
     $('.results-section').on('click','.js-book-review-button', function(event) {
@@ -441,7 +366,6 @@ function watchOpenLibraryRequest() {
     })
 }
 
-
 // Set up event listener on Reset Form
 function watchResetForm() {
     console.log('Ran watchResetForm function.')
@@ -452,7 +376,7 @@ function watchResetForm() {
     })
 }
 
-// Run the event-listener-setup function
+// Run the event-listeners-setup function
 function handleLookupPage() {
     console.log('Ran handleLookupPage function.');
     watchTastediveSearchForm();
