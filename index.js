@@ -31,22 +31,10 @@ function createResultsListItemString(resultObject,i) {
     const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
 
     // Create a "targetID" for to link the "request for reviews" button to  
-    //     a) the target element in the DOM where results will populate and 
-    //     b) the relevant item in the resultsList
     const targetID = `tasteDiveResult-${i}`;
-    console.log(targetID);
 
     // Add an object (key:value targetID:searchResultName) to master resultsList
     tastediveResultsSimpleList[targetID] = resultObject.Name;
-
-    // Create a shorthand name replacing spaces with minus signs, for reviews button/list element classes
-    // GOAL: DEPRECATE THIS
-    //const targetID = resultObject.Name.replace(/ /g, '-')
-    
-    // Create a value for each button, to facilitate NY Times API query.
-    // GOAL: DEPRECATE THIS
-    //const buttonValue = resultHitShorthand+`|type=${resultObject.Type[0]}`;
-    //console.log(buttonValue);
 
     return `
         <li>${resultObject.Name}
@@ -62,22 +50,60 @@ function createResultsListItemString(resultObject,i) {
 }
 
 
+// I know I should better-functionalize these... TBD (or not)...
+function createSparseResultsListItemString(resultObject,i) {
+    
+    // Create a shorthand name replacing spaces with plus signs, for Alibris/Indiebound URLs
+    const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
+
+    // Create a "targetID" for to link the "request for reviews" button to  
+    const targetID = `tasteDiveResult-${i}`;
+
+    // Add an object (key:value targetID:searchResultName) to master resultsList
+    tastediveResultsSimpleList[targetID] = resultObject.Name;
+
+    // Create a Google search URL
+    const googleSearchQuery = encodeURIComponent(resultObject.Name);
+    const googleSearchUrl = 'https://www.google.com/search?q='+googleSearchQuery;
+
+    return `
+        <li>${resultObject.Name}
+            <ul>
+                <li>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</li>
+                <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button></li>
+                <li id='js-reviews-target-${targetID}' class='hidden'></li>
+                <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
+                <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
+            </ul>
+        </li>`;
+}
+
+
 /********** RENDER FUNCTIONS **********/
 
 // Create TasteDive Results List + insert into the DOM.
-function displayGoodTasteDiveResults(resultsArray) {
+function displayGoodTasteDiveResults(resultsArray, searchTermName) {
     console.log('Ran displayGoodTasteDiveResults function.');
 
+    // Provide to user the successfully-parsed name of what they searched for
+    const successfulMessage = `Here are recommendations based on your search for ${searchTermName}:`;
+    $('.js-successful-search-message').html(successfulMessage);
+
+    // Create the HTML string containing the results list
     let resultsListHtmlString = '';
 
+    // Determine whether there is a Wikipedia link / summary for the search result
     for (let i=0 ; i<resultsArray.length ; i++) {
-        resultsListHtmlString += createResultsListItemString(resultsArray[i],i);
+        if (!resultsArray[i].wUrl) {
+            resultsListHtmlString += createSparseResultsListItemString(resultsArray[i],i);
+        } else {
+            resultsListHtmlString += createResultsListItemString(resultsArray[i],i);
+        }
     };
 
-    console.log(tastediveResultsSimpleList);
-
-    // Hide the TasteDive search form
+    // Hide the TasteDive search form and (in case it had been revealed) "tips" section
     $('.submission-section').addClass('hidden');
+    $('.search-tips-div').addClass('hidden');
 
     // Add the results list to the relevant list element + reveal it
     $('.js-results-list').append(resultsListHtmlString);
@@ -100,7 +126,7 @@ function handleTasteDiveResults(responseJson) {
     } else {
         console.log('Got search results!');
         $('.js-error-message').empty();
-        displayGoodTasteDiveResults(responseJson.Similar.Results);
+        displayGoodTasteDiveResults(responseJson.Similar.Results, responseJson.Similar.Info[0].Name);
     };
 }
 
@@ -114,9 +140,6 @@ function displayNytResults(reviewResultsArray) {
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
 
     for (let i=0 ; i<numberReviewsToShow ; i++) {
-        console.log(reviewResultsArray[i]);
-        console.log(reviewResultsArray[i].url);
-        console.log(reviewResultsArray[i].book_title);
         nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
     };
 
@@ -142,10 +165,6 @@ function displayOpenLibResults(results, queryISBNs) {
 // Handle NYTimes Books API search results
 function handleNytResults(responseJson,queryID) {
     console.log('Ran handleNytResults function.');
-
-    console.log(responseJson);
-
-    //const reviewTargetID = identifyingString.slice(0,-7).replace(/\+/g, '-');
 
     let nytReviewHTML = ''
 
@@ -181,9 +200,10 @@ function handleOpenLibraryResults(responseJson, queryISBNs) {
 
 // Handle clicks of the reset search form button
 function handleResetForm() {
-    console.log('Ran handleResetForm function');
+    console.log('Ran handleResetForm function.');
 
     // Empty contents of the results list and hide the results section
+    $('.js-successful-search-message').empty();
     $('.js-results-list').empty();
     $('.results-section').addClass('hidden');
 
@@ -204,6 +224,8 @@ function handleResetForm() {
     $('.restart-buttons-section').addClass('hidden');
 
     // TO-DO: RESET results list object and searchType thing
+    tastediveResultsSimpleList = {};
+    tastediveSearchType = '';
 }
 
 
@@ -297,11 +319,8 @@ function getTastediveRecommendations(searchTerm, searchType) {
 // Submit the NYTimes Books API GET request.
 function fetchNyTimesReviews(queryID) {
     console.log('Ran fetchNyTimesReviews function.')
-    console.log(queryID);
 
     const queryTerm = tastediveResultsSimpleList[queryID];
-
-    console.log(queryTerm);
 
     const params = {
         key: apiKey2,
@@ -382,7 +401,7 @@ function watchNyTimesReviewsRequest() {
 
 // Set up event listener on Open Library Search Form
 function watchOpenLibraryRequest() {
-    console.log('Ran watchOpenLibraryRequest function');
+    console.log('Ran watchOpenLibraryRequest function.');
 
     $('.open-library-section').on('submit','.open-library-form', function(event) {
         event.preventDefault();
