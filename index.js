@@ -39,13 +39,26 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
     tastediveResultsSimpleList[targetID] = resultObject.Name;
 
     return `
-        <li>${resultObject.Name}
-            <ul>
+        <li>
+            <div class='result-big-box group'>
+                <div class='main-hit-title item'>
+                    <h4 class='result-header-name'>${resultObject.Name}</h4>
+                </div>
+
+                <div class='result-medium-box item'>
                 ${summaryInfo}
-                <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button></li>
-                <li id='js-reviews-target-${targetID}' class='hidden'></li>
-                <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
-                <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
+                </div>
+
+                <button type='button' id='js-reviews-button-${targetID}' class='js-book-review-button item nyt-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button>
+                
+                <div id='js-reviews-target-${targetID}-div' class='result-medium-box reviews-box item hidden'>
+                    <ul id='js-reviews-target-${targetID}'>
+                </div>
+
+                <div class='result-medium-box item buttons-box buttons-group'>
+                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>Shop for used books.</a>
+                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>Shop at local bookstores.</a>
+                </div>
             </ul>
         </li>`;
 }
@@ -55,8 +68,8 @@ function createGoodResultsListItemString(resultObject) {
     //console.log('Ran createGoodResultsListItemString function.');
 
     return `
-    <li>${resultObject.wTeaser}</li>
-    <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>`;
+    <p class='thing-summary'>${resultObject.wTeaser}</p>
+    <p class="wiki-ref-link"><a href='${resultObject.wUrl}' target='_blank'>Learn more...</a>.</p>`;
 }
 
 // Create the HTML string containing "no teaser" message + formatted Google search, if Wiki info UNavailable from Tastedive results
@@ -67,7 +80,7 @@ function createSparseResultsSummary(resultObject) {
     const googleSearchQuery = encodeURIComponent(resultObject.Name);
     const googleSearchUrl = 'https://www.google.com/search?q='+googleSearchQuery;
     
-    return `<li>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</li>`;
+    return `<p class='thing-summary'>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</p>`;
 }
 
 
@@ -108,7 +121,7 @@ function displayGoodTasteDiveResults(resultsArray, searchTermName) {
 
     // Reveal the OpenLibrary lookup section and restart buttons section
     $('.open-library-section').removeClass('hidden');
-    $('.restart-buttons-section').removeClass('hidden');
+    $('.fresh-search').removeClass('hidden');
 }
 
 // Logic to determine how to handle the TasteDive search results
@@ -173,7 +186,7 @@ function handleNytResults(responseJson,queryID) {
     
     // Fill in reviews list and reveal the DOM element
     $(`#js-reviews-target-${queryID}`).html(nytReviewHTML);
-    $(`#js-reviews-target-${queryID}`).removeClass('hidden');
+    $(`#js-reviews-target-${queryID}-div`).removeClass('hidden');
 
     // Hide the "search" button
     $(`#js-reviews-button-${queryID}`).addClass('hidden');
@@ -218,7 +231,7 @@ function handleResetForm() {
     $('.open-library-results').addClass('hidden');
 
     // Hide the reset buttons section
-    $('.restart-buttons-section').addClass('hidden');
+    $('.fresh-search').addClass('hidden');
 
     // TO-DO: RESET results list object and searchType thing
     tastediveResultsSimpleList = {};

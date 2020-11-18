@@ -13,15 +13,23 @@
 </head>
 
 <body>
-  <main class='container'>
+  <main>
 
     <header>
-      <h1>Book Recommendation App</h1>
+      <div class='header-wrapper'>
+        <div class='header-group'>
+          <div class='page-title'>
+            <h1>BookFinder</h1>
+          </div>
+          <div class="reset-button-container">
+            <button class='fresh-search hidden' type='click'>Try a fresh search.</button>
+          </div>
+        </div>
+      </div>
+      <hr>
     </header>
 
-    <hr>
-
-    <section class='submission-section'>
+    <section class='submission-section pageContainer'>
       <h3>Search for recommendations based on a book title or author name.</h3>
       
       <div class='search-tips-div hidden'>
@@ -49,6 +57,12 @@
 
     </section>
 
+    <section class='results-section hidden'>
+      <h2 class='js-successful-search-message'></h2>
+      <ul class="js-results-list"></ul>
+    </section>
+
+    <section class='js-error-message'></section>
 
     <section class="open-library-section hidden">
       <h4>Did you find a specific book you're interested in? It might be freely available online at Open Library! To search, enter the <a href='https://en.wikipedia.org/wiki/International_Standard_Book_Number' target='_blank'>ISBN</a> for your book of interest.</h3>
@@ -67,19 +81,6 @@
       </div>
 
     </section>
-
-    <section class='restart-buttons-section hidden'>
-      <hr>
-      <button class='fresh-search' type='click'>Try a fresh search.</button>
-    </section>
-
-    <section class='results-section hidden'>
-      <hr>
-      <h2 class='js-successful-search-message'></h2>
-      <ul class="js-results-list"></ul>
-    </section>
-
-    <section class='js-error-message'></section>
 
     <hr>
 
