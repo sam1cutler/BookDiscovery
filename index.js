@@ -14,51 +14,106 @@ const baseNytEndpoint = 'https://api.nytimes.com/svc/books/v3/reviews.json?';
 const baseOpenLibraryEndpoint = 'https://openlibrary.org/api/books?';
 
 
+/********** Initialize empty results-tracking attributes **********/
+
+// object of TasteDive search results, associated with simply-named IDs
+let tastediveResultsSimpleList = {};
+
+// string that will be set to either "author" or "book" when the search is submitted
+let tastediveSearchType = '';
+
+
+
 /********** TEMPLATE GENERATION FUNCTIONS **********/
 
 // Create the HTML string for each item in the TasteDive results list
-function createResultsListItemString(resultObject) {
+function createResultsListItemString(resultObject,i,summaryInfo) {
 
     // Create a shorthand name replacing spaces with plus signs, for Alibris/Indiebound URLs
     const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
 
-    // Create a shorthand name replacing spaces with minus signs, for reviews button/list element classes
-    const targetID = resultObject.Name.replace(/ /g, '-')
-    
-    // Create a value for each button, to facilitate NY Times API query.
-    const buttonValue = resultHitShorthand+`|type=${resultObject.Type[0]}`;
-    console.log(buttonValue);
+    // Create a "targetID" for to link the "request for reviews" button to  
+    const targetID = `tasteDiveResult-${i}`;
 
-    // TO-DO: need to incorporate the type (author or book) into the button value to make the NYTimes API call work.
+    // Add an object (key:value targetID:searchResultName) to master resultsList
+    tastediveResultsSimpleList[targetID] = resultObject.Name;
 
     return `
-        <li>${resultObject.Name}
-            <ul>
-                <li>${resultObject.wTeaser}</li>
-                <li><a href='${resultObject.wUrl}' target='_blank'>Click here for the full Wikipedia page</a>.</li>
-                <li id='js-reviews-button-${targetID}'><button type="button" class='js-book-review-button' value='${buttonValue}'>Click here to search for relevant New York Times book reviews.</button></li>
-                <li id='js-reviews-target-${targetID}' class='hidden'></li>
-                <li>Shop for used books <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>here</a>.</li>
-                <li>Shop at local bookstores <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>here</a>.</li>
+        <li>
+            <div class='result-big-box group'>
+                <div class='main-hit-title item'>
+                    <h4 class='result-header-name'>${resultObject.Name}</h4>
+                </div>
+
+                <div class='result-medium-box item'>
+                ${summaryInfo}
+                </div>
+
+                <button type='button' id='js-reviews-button-${targetID}' class='js-book-review-button item nyt-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button>
+                
+                <div id='js-reviews-target-${targetID}-div' class='result-medium-box reviews-box item hidden'>
+                    <ul id='js-reviews-target-${targetID}'>
+                </div>
+
+                <div class='result-medium-box item buttons-box buttons-group'>
+                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'><button>Shop for used books.</button></a>
+                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'><button>Shop at local bookstores.</button></a>
+                </div>
             </ul>
         </li>`;
+}
+
+// Create the HTML string containing Wiki teaser + link, if available from Tastedive results
+function createGoodResultsListItemString(resultObject) {
+    //console.log('Ran createGoodResultsListItemString function.');
+
+    return `
+    <p class='thing-summary'>${resultObject.wTeaser}</p>
+    <p class="wiki-ref-link"><a href='${resultObject.wUrl}' target='_blank'>Learn more...</a>.</p>`;
+}
+
+// Create the HTML string containing "no teaser" message + formatted Google search, if Wiki info UNavailable from Tastedive results
+function createSparseResultsSummary(resultObject) {
+    //console.log('Ran createSparseResultsSummary function.');
+
+    // Create a Google search URL
+    const googleSearchQuery = encodeURIComponent(resultObject.Name);
+    const googleSearchUrl = 'https://www.google.com/search?q='+googleSearchQuery;
+    
+    return `<p class='thing-summary'>Could not find information about this result, but you can try <a href='${googleSearchUrl}' target='_blank'>doing a Google search</a>.</p>`;
 }
 
 
 /********** RENDER FUNCTIONS **********/
 
 // Create TasteDive Results List + insert into the DOM.
-function displayGoodTasteDiveResults(resultsArray) {
+function displayGoodTasteDiveResults(resultsArray, searchTermName) {
     console.log('Ran displayGoodTasteDiveResults function.');
 
+    // Provide to user the successfully-parsed name of what they searched for
+    const successfulMessage = `Here are recommendations based on your search for ${searchTermName}:`;
+    $('.js-successful-search-message').html(successfulMessage);
+
+    // Create the HTML string containing the results list
     let resultsListHtmlString = '';
 
     for (let i=0 ; i<resultsArray.length ; i++) {
-        resultsListHtmlString += createResultsListItemString(resultsArray[i]);
+
+        // Initialize empty "summary info" string
+        let summaryInfoHtml = '';
+
+        // Determine whether there is a Wikipedia link / summary for the search result
+        if (!resultsArray[i].wUrl) {
+            summaryInfoHtml = createSparseResultsSummary(resultsArray[i]);
+        } else {
+            summaryInfoHtml = createGoodResultsListItemString(resultsArray[i]);
+        }
+        resultsListHtmlString += createResultsListItemString(resultsArray[i],i,summaryInfoHtml);
     };
 
-    // Hide the TasteDive search form
+    // Hide the TasteDive search form and (in case it had been revealed) "tips" section
     $('.submission-section').addClass('hidden');
+    $('.search-tips-div').addClass('hidden');
 
     // Add the results list to the relevant list element + reveal it
     $('.js-results-list').append(resultsListHtmlString);
@@ -66,7 +121,7 @@ function displayGoodTasteDiveResults(resultsArray) {
 
     // Reveal the OpenLibrary lookup section and restart buttons section
     $('.open-library-section').removeClass('hidden');
-    $('.restart-buttons-section').removeClass('hidden');
+    $('.fresh-search').removeClass('hidden');
 }
 
 // Logic to determine how to handle the TasteDive search results
@@ -76,11 +131,13 @@ function handleTasteDiveResults(responseJson) {
 
     if (responseJson.Similar.Results.length === 0) {
         console.log('Did not get any search results.');
-        $('.js-error-message').html('<hr><h4>This search did not get any results. Please try again. Tips etc.</h4>');
+        $('.js-error-message').html('<h4>This search did not get any results. Please try again.');
+        $('.js-error-message').removeClass('hidden');
+        $('.search-tips-div').removeClass('hidden');
     } else {
         console.log('Got search results!');
         $('.js-error-message').empty();
-        displayGoodTasteDiveResults(responseJson.Similar.Results);
+        displayGoodTasteDiveResults(responseJson.Similar.Results, responseJson.Similar.Info[0].Name);
     };
 }
 
@@ -93,16 +150,10 @@ function displayNytResults(reviewResultsArray) {
     // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
 
-    console.log(numberReviewsToShow);
-
     for (let i=0 ; i<numberReviewsToShow ; i++) {
-        console.log(reviewResultsArray[i]);
-        console.log(reviewResultsArray[i].url);
-        console.log(reviewResultsArray[i].book_title);
         nytReviewHTML += `<li><a href='${reviewResultsArray[i].url}' target="_blank">${reviewResultsArray[i].book_title}</a></li>`
     };
 
-    console.log(nytReviewHTML);
     nytReviewHTML += '</ul>';
 
     return nytReviewHTML;
@@ -112,30 +163,24 @@ function displayNytResults(reviewResultsArray) {
 function displayOpenLibResults(results, queryISBNs) {
     console.log('Ran displayOpenLibResults function.');
 
-    console.log(results);
-
     const ISBNcall = `${queryISBNs}`;
 
-    console.log(results[ISBNcall]);
+    const openLibHTML = `
+        <div class='buttons-group'>
+            <img src="${results[ISBNcall].thumbnail_url}" alt="open-library thumbnail preview">
+            <div>
+                <a href='${results[ISBNcall].info_url}' target="_blank"><button>Open Library Book</button></a>
+            </div>
+        </div>`;
 
-    console.log(results[ISBNcall].info_url);
-    // eventually, need to tweak to accomodate multiple results...
-
-    const openLibHTML = `<li>
-        <img src="${results[ISBNcall].thumbnail_url}" alt="open library thumbnail preview">
-        <a href=${results[ISBNcall].info_url} target="_blank">${results[ISBNcall].info_url}</a></li>`;
 
     return openLibHTML;
 }
 
 
 // Handle NYTimes Books API search results
-function handleNytResults(responseJson,identifyingString) {
+function handleNytResults(responseJson,queryID) {
     console.log('Ran handleNytResults function.');
-
-    console.log(responseJson.results);
-
-    const reviewTargetID = identifyingString.slice(0,-7).replace(/\+/g, '-');
 
     let nytReviewHTML = ''
 
@@ -146,18 +191,16 @@ function handleNytResults(responseJson,identifyingString) {
     };
     
     // Fill in reviews list and reveal the DOM element
-    $(`#js-reviews-target-${reviewTargetID}`).html(nytReviewHTML);
-    $(`#js-reviews-target-${reviewTargetID}`).removeClass('hidden');
+    $(`#js-reviews-target-${queryID}`).html(nytReviewHTML);
+    $(`#js-reviews-target-${queryID}-div`).removeClass('hidden');
 
     // Hide the "search" button
-    $(`#js-reviews-button-${reviewTargetID}`).addClass('hidden');
+    $(`#js-reviews-button-${queryID}`).addClass('hidden');
 }
 
 // Handle OpenLibrary API search results
 function handleOpenLibraryResults(responseJson, queryISBNs) {
     console.log('Ran handleOpenLibraryResults function.');
-
-    console.log(responseJson);
 
     let openLibHTML = ''
 
@@ -167,22 +210,24 @@ function handleOpenLibraryResults(responseJson, queryISBNs) {
         openLibHTML = displayOpenLibResults(responseJson, queryISBNs);
     };
 
-    $('.open-library-results-list').html(openLibHTML);
+    $('.open-library-results').html(openLibHTML);
     $('.open-library-results').removeClass('hidden');
 }
 
 // Handle clicks of the reset search form button
 function handleResetForm() {
-    console.log('Ran handleResetForm function');
+    console.log('Ran handleResetForm function.');
 
     // Empty contents of the results list and hide the results section
+    $('.js-successful-search-message').empty();
     $('.js-results-list').empty();
     $('.results-section').addClass('hidden');
 
-    // Empty contents of the Tastedive search field, and reveal search section and search tips div.
+    // Empty contents of the Tastedive search field, reveal search section and search tips, hide 'primary instruction' welcome message.
     $('#tastedive-search-field').val('');
     $('.submission-section').removeClass('hidden');
     $('.search-tips-div').removeClass('hidden');
+    $('.primary-instruction').addClass('hidden');
 
     // Empty contents of and hide the Open Library section
     $('#js-isbn-field').val('');
@@ -193,8 +238,16 @@ function handleResetForm() {
     $('.open-library-results').addClass('hidden');
 
     // Hide the reset buttons section
-    $('.restart-buttons-section').addClass('hidden');
+    $('.fresh-search').addClass('hidden');
+
+    // Scroll to the top of the page.
+    $(window).scrollTop(0);
+
+    // Reset results list object and searchType thing
+    tastediveResultsSimpleList = {};
+    tastediveSearchType = '';
 }
+
 
 /********** API REQUEST STRING GENERATION FUNCTIONS **********/
 
@@ -221,8 +274,6 @@ function formatTasteDiveQueryParams(queryParams) {
     //queryString += '&limit=5';       // => add limit to # of search results (seems to mess up CORB requirement?)
     queryString += queryParams.key;  // => add the API key
 
-    console.log(queryString);
-
     return queryString;
 }
 
@@ -230,14 +281,15 @@ function formatNytQueryParams(queryParams) {
     console.log('Ran formatNytQueryParams function.');
 
     // true query term omits the end-of-the-string tag for author/title type
-    const coreQuery = queryParams.requestedReference.slice(0,-7);
-    console.log(coreQuery);
+    //const coreQuery = queryParams.requestedReference.slice(0,-7);
+
+    const coreQuery = queryParams.requestedReference.replace(/ /g, '+');
 
     // Determine whether searching for an author or title
     let searchType = '';
-    if (queryParams.requestedReference.slice(-1) === 'a') {
+    if (tastediveSearchType === 'author') {
         searchType = 'author=';
-    } else if (queryParams.requestedReference.slice(-1) === 'b') {
+    } else if (tastediveSearchType === 'book') {
         searchType = 'title=';
     };
 
@@ -249,12 +301,9 @@ function formatNytQueryParams(queryParams) {
 function formatOpenLibQueryParams(queryParams) {
     console.log('Ran formatOpenLibQueryParams function.');
 
-    // Eventually, this should iterate through list items in query array...
-
     const queryString = `bibkeys=${queryParams}&format=json`;
 
     return queryString;
-
 }
 
 /********** API REQUEST FUNCTIONS **********/
@@ -282,44 +331,16 @@ function getTastediveRecommendations(searchTerm, searchType) {
             throw new Error(response.statusText);
         })
         .then(responseJson => handleTasteDiveResults(responseJson))
-        //.then(responseJson => console.log(responseJson))
-        .catch(err => {
-            $('#js-error-message').text(`Something went wrong: ${err.message}`);
-        });
-}
-
-// Submit the TasteDive API GET request. [OLD VERSION TO BE ELIMINATED]
-function getRecommendations(requestedReferencesArray) {
-    console.log('Ran getRecommendations function.');
-
-    const params = {
-        key: apiKey1,
-        requestedReferences: requestedReferencesArray,
-    };
-
-    const queryString = formatTasteDiveQueryParams(params);
-    const URLtoBeFetched = baseTasteDiveEndpoint+queryString;
-    console.log(URLtoBeFetched);
-
-    fetchJsonp(URLtoBeFetched)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-                //console.log(response.json());
-            }
-            throw new Error(response.statusText);
-        })
-        .then(responseJson => handleTasteDiveResults(responseJson))
-        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
 }
 
 // Submit the NYTimes Books API GET request.
-function fetchNyTimesReviews(queryTerm) {
+function fetchNyTimesReviews(queryID) {
     console.log('Ran fetchNyTimesReviews function.')
-    console.log(queryTerm);
+
+    const queryTerm = tastediveResultsSimpleList[queryID];
 
     const params = {
         key: apiKey2,
@@ -339,8 +360,7 @@ function fetchNyTimesReviews(queryTerm) {
             }
             throw new Error(response.statusText);
         })
-        .then(responseJson => handleNytResults(responseJson, queryTerm))
-        //.then(responseJson => console.log(responseJson))
+        .then(responseJson => handleNytResults(responseJson, queryID))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
@@ -365,17 +385,14 @@ function fetchOpenLibraryBooks(queryISBNs) {
             throw new Error(response.statusText);
         })
         .then(responseJson => handleOpenLibraryResults(responseJson, queryISBNs))
-        //.then(responseJson => console.log(responseJson))
         .catch(err => {
             $('#js-error-message').text(`Something went wrong: ${err.message}`);
         });
 }
 
-
-
 /********** EVENT HANDLER FUNCTIONS **********/
 
-//
+// Set up event listener on primary submission form
 function watchTastediveSearchForm() {
     console.log('Ran watchTastediveSearchForm.')
 
@@ -385,39 +402,13 @@ function watchTastediveSearchForm() {
 
         const searchTerm = $('#tastedive-search-field').val();
         const searchType = $('.tastedive-search-type').val();
+        tastediveSearchType = searchType;
 
         getTastediveRecommendations(searchTerm, searchType);
-
-    })
-
-}
-
-// Set up event listener on Submission Form
-function watchSubmissionForm() {
-    console.log('Ran watchForm function.');
-
-    $('.submission-section').on('submit','.submission-form', function(event) {
-        event.preventDefault();
-        console.log('The submission form was submitted.');
-
-        // Store data from form submission in an array.
-        let requestArray = [];
-        
-        // *** note: eventually want a more elegant / generalized solution to "how many references did user submit?"
-        for (let i=1 ; i<4 ; i++) {
-            if ( $(`#js-search-field${i}`).val() != '' ) {
-                requestArray.push( $(`#js-search-field${i}`).val().toLowerCase() );
-            }
-        }
-        
-        console.log('The user has requested recommendations based on:');
-        console.log(requestArray);
-
-        getRecommendations(requestArray);  
     })
 }
 
-// Set up event listener on "Show Reviews" button
+// Set up event listener on "Show NYT Reviews" button
 function watchNyTimesReviewsRequest() {
     console.log('Ran watchNyTimesReviewsRequest function.')
     $('.results-section').on('click','.js-book-review-button', function(event) {
@@ -430,7 +421,7 @@ function watchNyTimesReviewsRequest() {
 
 // Set up event listener on Open Library Search Form
 function watchOpenLibraryRequest() {
-    console.log('Ran watchOpenLibraryRequest function');
+    console.log('Ran watchOpenLibraryRequest function.');
 
     $('.open-library-section').on('submit','.open-library-form', function(event) {
         event.preventDefault();
@@ -440,7 +431,6 @@ function watchOpenLibraryRequest() {
         fetchOpenLibraryBooks(requestedISBN);
     })
 }
-
 
 // Set up event listener on Reset Form
 function watchResetForm() {
@@ -452,7 +442,7 @@ function watchResetForm() {
     })
 }
 
-// Run the event-listener-setup function
+// Run the event-listeners-setup function
 function handleLookupPage() {
     console.log('Ran handleLookupPage function.');
     watchTastediveSearchForm();
@@ -461,5 +451,4 @@ function handleLookupPage() {
     watchResetForm();
 }
 
-
-$(handleLookupPage)
+$(handleLookupPage);
