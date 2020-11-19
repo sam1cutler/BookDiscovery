@@ -113,6 +113,9 @@ function displayGoodTasteDiveResults(resultsArray, searchTermName) {
         resultsListHtmlString += createResultsListItemString(resultsArray[i],i,summaryInfoHtml);
     };
 
+    // Scroll back to the top of the page
+    $(window).scrollTop(0);
+    
     // Hide the TasteDive search form and (in case it had been revealed) "tips" section
     $('.submission-section').addClass('hidden');
     $('.search-tips-div').addClass('hidden');

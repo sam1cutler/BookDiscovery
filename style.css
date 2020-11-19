@@ -11,6 +11,7 @@ header {
   padding: 0px; 
   position: sticky;
   top: 0;
+  min-height: 15vh;
 }
 
 .header-wrapper {
@@ -18,6 +19,7 @@ header {
   width: 100%;
   height: 100%;
   padding: 5px;
+  min-height: 15vh;
 }
 
 h1 {
@@ -44,6 +46,14 @@ hr {
   color: black;
 }
 
+.submission-section {
+  min-height: 70vh;
+}
+
+.primary-instruction h2 h3{
+  margin: 0px;
+}
+
 .search-label {
   margin-top: 15px;
   font-size: 20pt;
@@ -54,6 +64,7 @@ footer {
   background-color: rgb(200, 200, 230);
   margin: 0px;
   padding: 10px 30px;
+  min-height: 15vh;
 }
 
 /*--- button and field styles ---*/
@@ -97,7 +108,7 @@ button {
 /*--- Tastedive search results styles ---*/
 .result-big-box {
   border: 1px solid rgb(190, 189, 189);
-  margin: 2%;
+  margin: 5% 2%;
   padding: 2px 10px;
   background-color: rgb(219, 219, 240);
   border-radius: 8px;
@@ -229,6 +240,13 @@ main a:active  { color: deepskyblue;}
   flex: 1;
 }
 
+.submission-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .header-group {
   display: flex;
   flex-direction: column;
@@ -283,6 +301,7 @@ main a:active  { color: deepskyblue;}
 
   .result-big-box {
     padding: 10px 25px;
+    margin: 3%;
   }
 
   .result-medium-box {
