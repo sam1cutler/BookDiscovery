@@ -7,7 +7,7 @@ This online tool will allow users to submit books and authors they know they lik
 
 ## Summary
 The user begins by entering a book or author they like:
-![search field](./screenshots/search-field.png)
+![search field](./screenshots/search-field.png "search field")
 
 Next, the app will use the [TasteDive API](https://tastedive.com/) to curate a list of recommendations, along with brief summaries pulled from Wikipedia and links to corresponding Wikipedia entries, when that info is available in the TasteDive API results.
 ![search results](./screenshots/search-results.png)
