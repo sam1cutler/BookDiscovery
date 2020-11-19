@@ -44,6 +44,12 @@ hr {
   color: black;
 }
 
+.search-label {
+  margin-top: 15px;
+  font-size: 20pt;
+  font-weight: 900;
+}
+
 footer {
   background-color: rgb(200, 200, 230);
   margin: 0px;
@@ -101,15 +107,26 @@ button {
 .main-hit-title {
   width: 100%;
   padding-left: 20px;
+  margin: 10px 5px 5px 5px;
 }
 
 .result-medium-box {
   border: 1px solid rgb(136, 134, 134);
   padding: 2%;
+  margin: 5px;
   width: 100%;
   background-color: rgb(200, 200, 230);
   border-radius: 8px;
   box-shadow: 0 0 3px grey;
+}
+
+.js-successful-search-message h3, h2 {
+  margin: 5px;
+  text-align: center;
+}
+
+.search-summary-box {
+  width: auto;
 }
 
 .result-header-name {
@@ -126,6 +143,17 @@ button {
 
 .reviews-box {
   width: 80%;
+  padding: 10px 20px 10px 10px;
+}
+
+.reviews-box h3 {
+  margin: 0px 0px 10px 10px;
+}
+
+.no-nyt-reviews-message {
+  width: auto;
+  text-align: center;
+  padding: 5px;
 }
 
 .buttons-box {
@@ -141,11 +169,20 @@ button {
 }
 
 .thing-summary {
-  margin: 10px 20px 0px 20px;
+  margin: 10px;
+}
+
+.js-error-message h4 {
+  margin: 5px;
+  text-align: center;
 }
 
 
 /*--- misc other sections styles ---*/
+.primary-instruction h2 {
+  margin-top: 20px;
+}
+
 .tips-medium-box {
   border: 1px solid rgb(136, 134, 134);
   margin: 10px;
@@ -159,10 +196,12 @@ button {
 
 .tips-title, .isbn-title {
   text-shadow: 0 0 1px grey;
+  margin: 10px 10px 0px 10px;
+  text-align: center;
 }
 
-.isbn-title {
-  text-align: center;
+.tips-medium-box p {
+  margin: 5px;
 }
 
 .isbn-results-box {
@@ -188,7 +227,6 @@ main a:active  { color: deepskyblue;}
 
 .item {
   flex: 1;
-  margin: 10px;
 }
 
 .header-group {
@@ -227,6 +265,10 @@ main a:active  { color: deepskyblue;}
     margin-bottom: 0px;
   }
 
+  .search-label {
+    margin: 0px;
+  }
+
   .fresh-search {
     font-size: 12pt;
   }
@@ -248,6 +290,31 @@ main a:active  { color: deepskyblue;}
     width: 100%;
   }
 
+  .search-summary-box {
+    width: auto;
+  }
+  
+  .buttons-box {
+    width: 80%;
+  }
+
+  .thing-summary {
+    margin: 10px 20px 0px 20px;
+  }
+
+  .reviews-box {
+    width: auto;
+    padding: 10px 40px 20px 40px;
+  }
+  
+  .reviews-box h3 {
+    margin: 10px;
+  }
+
+  .no-nyt-reviews-message {
+    padding: 5px 20px;
+  }
+
   .buttons-group, .header-group {
     flex-direction: row;
   }
@@ -258,6 +325,10 @@ main a:active  { color: deepskyblue;}
 
   .header-group {
     justify-content: space-between;
+  }
+
+  .tips-title, .isbn-title {
+    margin: 20px;
   }
 }
 

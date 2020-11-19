@@ -51,7 +51,7 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
 
                 <button type='button' id='js-reviews-button-${targetID}' class='js-book-review-button item nyt-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button>
                 
-                <div id='js-reviews-target-${targetID}-div' class='result-medium-box reviews-box item hidden'>
+                <div id='js-reviews-target-${targetID}' class='result-medium-box reviews-box item hidden'>
                     <ul id='js-reviews-target-${targetID}'>
                 </div>
 
@@ -91,7 +91,9 @@ function displayGoodTasteDiveResults(resultsArray, searchTermName) {
     console.log('Ran displayGoodTasteDiveResults function.');
 
     // Provide to user the successfully-parsed name of what they searched for
-    const successfulMessage = `Here are recommendations based on your search for ${searchTermName}:`;
+    const successfulMessage = `
+        <h3>Here are recommendations based on your search for...</h3>
+        <div class='result-medium-box search-summary-box'><h2>${searchTermName}</h2></div>`;
     $('.js-successful-search-message').html(successfulMessage);
 
     // Create the HTML string containing the results list
@@ -145,7 +147,9 @@ function handleTasteDiveResults(responseJson) {
 function displayNytResults(reviewResultsArray) {
     console.log('Ran displayNytResults function');
 
-    let nytReviewHTML = 'New York Times book reviews:<ul>';
+    let nytReviewHTML = `
+        <h3>New York Times book reviews:</h3>
+        <ul>`;
 
     // Define lower of two values: either the # of search results, or 5 (to avoid huge list of reviews)
     const numberReviewsToShow = Math.min(reviewResultsArray.length, 5);
@@ -185,14 +189,15 @@ function handleNytResults(responseJson,queryID) {
     let nytReviewHTML = ''
 
     if (responseJson.results.length === 0) {
-        nytReviewHTML = 'Sorry, could not find any relevant reviews.';
+        nytReviewHTML = '<p><i>Sorry, could not find any relevant reviews.</i></p>';
+        $(`#js-reviews-target-${queryID}`).addClass('no-nyt-reviews-message');
     } else {
         nytReviewHTML = displayNytResults(responseJson.results);
     };
     
     // Fill in reviews list and reveal the DOM element
     $(`#js-reviews-target-${queryID}`).html(nytReviewHTML);
-    $(`#js-reviews-target-${queryID}-div`).removeClass('hidden');
+    $(`#js-reviews-target-${queryID}`).removeClass('hidden');
 
     // Hide the "search" button
     $(`#js-reviews-button-${queryID}`).addClass('hidden');
@@ -237,8 +242,9 @@ function handleResetForm() {
     $('.open-library-results-list').empty();
     $('.open-library-results').addClass('hidden');
 
-    // Hide the reset buttons section
+    // Hide the reset button and error message sections
     $('.fresh-search').addClass('hidden');
+    $('.js-error-message').addClass('hidden');
 
     // Scroll to the top of the page.
     $(window).scrollTop(0);
