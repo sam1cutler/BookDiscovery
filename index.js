@@ -56,8 +56,8 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
                 </div>
 
                 <div class='result-medium-box item buttons-box buttons-group'>
-                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'>Shop for used books.</a>
-                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'>Shop at local bookstores.</a>
+                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'><button>Shop for used books.</button></a>
+                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'><button>Shop at local bookstores.</button></a>
                 </div>
             </ul>
         </li>`;
@@ -131,7 +131,8 @@ function handleTasteDiveResults(responseJson) {
 
     if (responseJson.Similar.Results.length === 0) {
         console.log('Did not get any search results.');
-        $('.js-error-message').html('<hr><h4>This search did not get any results. Please try again.');
+        $('.js-error-message').html('<h4>This search did not get any results. Please try again.');
+        $('.js-error-message').removeClass('hidden');
         $('.search-tips-div').removeClass('hidden');
     } else {
         console.log('Got search results!');
@@ -164,9 +165,14 @@ function displayOpenLibResults(results, queryISBNs) {
 
     const ISBNcall = `${queryISBNs}`;
 
-    const openLibHTML = `<li>
-        <img src="${results[ISBNcall].thumbnail_url}" alt="open library thumbnail preview">
-        <a href=${results[ISBNcall].info_url} target="_blank">${results[ISBNcall].info_url}</a></li>`;
+    const openLibHTML = `
+        <div class='buttons-group'>
+            <img src="${results[ISBNcall].thumbnail_url}" alt="open-library thumbnail preview">
+            <div>
+                <a href='${results[ISBNcall].info_url}' target="_blank"><button>Open Library Book</button></a>
+            </div>
+        </div>`;
+
 
     return openLibHTML;
 }
@@ -204,7 +210,7 @@ function handleOpenLibraryResults(responseJson, queryISBNs) {
         openLibHTML = displayOpenLibResults(responseJson, queryISBNs);
     };
 
-    $('.open-library-results-list').html(openLibHTML);
+    $('.open-library-results').html(openLibHTML);
     $('.open-library-results').removeClass('hidden');
 }
 
@@ -217,10 +223,11 @@ function handleResetForm() {
     $('.js-results-list').empty();
     $('.results-section').addClass('hidden');
 
-    // Empty contents of the Tastedive search field, and reveal search section and search tips div.
+    // Empty contents of the Tastedive search field, reveal search section and search tips, hide 'primary instruction' welcome message.
     $('#tastedive-search-field').val('');
     $('.submission-section').removeClass('hidden');
     $('.search-tips-div').removeClass('hidden');
+    $('.primary-instruction').addClass('hidden');
 
     // Empty contents of and hide the Open Library section
     $('#js-isbn-field').val('');
@@ -233,7 +240,10 @@ function handleResetForm() {
     // Hide the reset buttons section
     $('.fresh-search').addClass('hidden');
 
-    // TO-DO: RESET results list object and searchType thing
+    // Scroll to the top of the page.
+    $(window).scrollTop(0);
+
+    // Reset results list object and searchType thing
     tastediveResultsSimpleList = {};
     tastediveSearchType = '';
 }

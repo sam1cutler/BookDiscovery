@@ -29,56 +29,75 @@
       <hr>
     </header>
 
-    <section class='submission-section pageContainer'>
-      <h3>Search for recommendations based on a book title or author name.</h3>
-      
-      <div class='search-tips-div hidden'>
-        <p><i>A couple tips to make your searches more effective:</i></p>
-        <ul>
-          <li>Using an author's full name (first and last) is likely to give better results, as is being precise in spelling and use of special characters - for example, a search for Roberto Bolaño (note the <b>ñ</b>!) will do better than a search for Roberto Bolano!</li>
-          <li>If you don't find a review of a specific book, a search for that book's author is more likely to successfully find reviews.</li>
-        </ul>
+    <section class='submission-section pageContainer group'>
+      <div class='result-big-box primary-instruction item group'>
+        <h2 class='item'>Find new books to read!</h2>
+        <h3 class='item'>Submit a book or author you like to find new, similar books or authors.</h3>
       </div>
-
-      <form class='tastedive-search-form'>
-        <!-- primary search field -->
-        <label for="tastedive-search-field">Book/Author:</label>
-          <input type="text" name='tastedive-search-field' id='tastedive-search-field' required></input>
-        
-        <!-- dropdown menu for book/author -->
-        <select class='tastedive-search-type' size="1">
-          <option value="book">Book</option>
-          <option value="author">Author</option>
-        </select><br>
+      
+      <form class='tastedive-search-form result-big-box item group'>
+        <div class='item'>
+          <!-- primary search field -->
+          <label for='tastedive-search-field'>Book/Author:</label>
+            <input type='text' name='tastedive-search-field' id='tastedive-search-field' required></input>
+          
+          <!-- dropdown menu for book/author -->
+          <select class='tastedive-search-type' size="1">
+            <option value='book'>Book</option>
+            <option value='author'>Author</option>
+          </select><br>
+        </div>
         
         <!-- form submission button -->
-        <button type="submit">Find my recommendations!</button>
+        <button type='submit' class='item'>Find my recommendations!</button>
       </form>
 
-    </section>
+      <section class='js-error-message result-big-box hidden'></section>
 
-    <section class='results-section hidden'>
-      <h2 class='js-successful-search-message'></h2>
-      <ul class="js-results-list"></ul>
-    </section>
-
-    <section class='js-error-message'></section>
-
-    <section class="open-library-section hidden">
-      <h4>Did you find a specific book you're interested in? It might be freely available online at Open Library! To search, enter the <a href='https://en.wikipedia.org/wiki/International_Standard_Book_Number' target='_blank'>ISBN</a> for your book of interest.</h3>
-
-      <form class='open-library-form'>
-        <div class='submission-field'>
-          <label for="js-isbn-field1">ISBN:</label>
-            <input type="text" name="js-isbn-field" id="js-isbn-field"></input>
-        </div><br>
-        <button type="submit">Find an Open Library book!</button>
-      </form>
-
-      <div class="open-library-results hidden">
-        <h4>Here are the search results:</h4>
-        <ul class="open-library-results-list"></ul>
+      <div class='search-tips-div result-big-box group hidden'>
+        <div>
+          <h3 class='tips-title'><i>A couple tips to make your searches more effective:</i></h3>
+        </div>
+        <div class='buttons-group'>
+          <div class='tips-medium-box'>
+            <p>Using an author's <b>full name</b> (first and last) is likely to give better results, as is being <b>precise in spelling</b> and use of special characters.</p>
+            <p>For example, a search for "Roberto Bolaño" (note the <b>ñ</b>!) will do better than a search for "Roberto Bolano".</p>
+          </div>
+          <div class='tips-medium-box'>
+            <p>If you don't find a review of a <b>specific book</b>, a search for <b>that book's author</b> is more likely to successfully find reviews.</p>
+          </div>
+        </div>
       </div>
+
+    </section>
+
+    <section class='results-section pageContainer group hidden'>
+      <h2 class='js-successful-search-message result-big-box item'></h2>
+      <ul class="js-results-list item"></ul>
+      <div class='result-big-box'>
+        <h4>End of search results!</h4>
+      </div>
+    </section>
+    
+    <section class="open-library-section pageContainer hidden">
+      <hr>
+      <div class='result-big-box group'>
+        <div>
+          <h4 class='isbn-title'>Did you find a specific book you're interested in? It might be freely available online at Open Library! To search, enter the <a href='https://en.wikipedia.org/wiki/International_Standard_Book_Number' target='_blank'>ISBN</a> for your book of interest.</h4>
+        </div>
+
+        <div>
+        <form class='open-library-form'>
+          <div class='submission-field'>
+            <label for="js-isbn-field1">ISBN:</label>
+              <input type="text" name="js-isbn-field" id="js-isbn-field"></input>
+          </div><br>
+          <button type="submit">Find an Open Library book!</button>
+        </form>
+        </div>
+
+        <div class="open-library-results result-medium-box isbn-results-box hidden"></div>
+    </div>
 
     </section>
 

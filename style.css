@@ -22,7 +22,7 @@ header {
 
 h1 {
   font-size: 60px;
-  color: white;
+  color: rgb(255, 255, 255);
   margin-bottom: 10px;
 }
 
@@ -87,8 +87,8 @@ button {
   margin: 1px;
 }
 
-.hidden {
-  display: none;
+.primary-instruction {
+  text-align: center;
 }
 
 .js-error-message {
@@ -129,8 +129,14 @@ button {
   width: 60%;
 }
 
+.isbn-results-box {
+  width: 60%;
+  margin: 20px;
+}
+
 .js-results-list {
   list-style-type: none;
+  padding: 0px;
 }
 
 .result-header-name {
@@ -152,6 +158,26 @@ button {
 .thing-summary {
   margin: 10px 20px 0px 20px;
 }
+
+.tips-medium-box {
+  border: 1px solid rgb(136, 134, 134);
+  margin: 10px;
+  padding: 10px;
+  width: 100%;
+  background-color: rgb(200, 200, 230);
+  border-radius: 8px;
+  box-shadow: 0 0 3px grey;
+  text-align: center;
+}
+
+.tips-title, .isbn-title {
+  text-shadow: 0 0 1px grey;
+}
+
+.isbn-title {
+  text-align: center;
+}
+
 
 /*--- pseudo-classes ---*/ 
 main a:link    { color: rgb(23, 76, 156);}
@@ -192,10 +218,14 @@ header nav a:active {color: rgb(184, 183, 183);}
   align-items: center;
 }
 
+.open-lib-link-button {
+  max-width: 200px;
+}
 
-/* Groups & Items  (Desktop) */
 
-@media all and (min-width: 800px) {
+/*--- Groups & Items (Desktop) ---*/
+
+@media all and (min-width: 650px) {
   .buttons-group, .header-group {
     flex-direction: row;
   }
@@ -208,4 +238,14 @@ header nav a:active {color: rgb(184, 183, 183);}
     justify-content: space-between;
   }
 
+  .submission-section {
+    
+  }
+
+}
+
+
+/*--- give hidden class highest priority ---*/
+.hidden {
+  display: none;
 }
