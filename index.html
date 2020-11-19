@@ -36,7 +36,7 @@
       </div>
       
       <form class='tastedive-search-form result-big-box item group'>
-        <div class='item'>
+        <div class='item buttons-group'>
           <!-- primary search field -->
           <label for='tastedive-search-field'>Book/Author:</label>
             <input type='text' name='tastedive-search-field' id='tastedive-search-field' required></input>
@@ -45,7 +45,7 @@
           <select class='tastedive-search-type' size="1">
             <option value='book'>Book</option>
             <option value='author'>Author</option>
-          </select><br>
+          </select>
         </div>
         
         <!-- form submission button -->
@@ -87,13 +87,11 @@
         </div>
 
         <div>
-        <form class='open-library-form'>
-          <div class='submission-field'>
-            <label for="js-isbn-field1">ISBN:</label>
+          <form class='open-library-form buttons-group'>
+            <label for="js-isbn-field">ISBN:</label>
               <input type="text" name="js-isbn-field" id="js-isbn-field"></input>
-          </div><br>
-          <button type="submit">Find an Open Library book!</button>
-        </form>
+            <button type="submit">Find an Open Library book!</button>
+          </form>
         </div>
 
         <div class="open-library-results result-medium-box isbn-results-box hidden"></div>
