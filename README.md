@@ -7,10 +7,10 @@ This online tool will allow users to submit books and authors they know they lik
 
 ## Summary
 The user begins by entering a book or author they like:
-![search field](/screenshots/search-field.png =250x)
+![search field](./screenshots/search-field.png =250x)
 
 Next, the app will use the [TasteDive API](https://tastedive.com/) to curate a list of recommendations, along with brief summaries pulled from Wikipedia and links to corresponding Wikipedia entries, when that info is available in the TasteDive API results.
-![/screenshots/search-results.png]
+![./screenshots/search-results.png]
 
 In addition, users will have the option to click a button that will generate a list of New York Times book reviews, generated using the [NYTimes Books API](https://developer.nytimes.com/docs/books-product/1/overview). 
 ![/screenshots/nyt-option.png]
