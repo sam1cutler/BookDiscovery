@@ -2,25 +2,30 @@
 
 /********** Define strings for the APIs **********/
 
-// TasteDive API.
-const apiKey1 = '391102-BookReco-Z2ZG9UZJ';
-const baseTasteDiveEndpoint = 'https://tastedive.com/api/similar?';
+const apiStore = {
+    // TasteDive API.
+    apiKey1: '391102-BookReco-Z2ZG9UZJ',
+    baseTasteDiveEndpoint: 'https://tastedive.com/api/similar?',
 
-// NYTimes API
-const apiKey2 = 'reKLNnPSUMVZmXe2dGGr9gAaLmAOVhGy';
-const baseNytEndpoint = 'https://api.nytimes.com/svc/books/v3/reviews.json?';
+    // NYTimes API
+    apiKey2: 'reKLNnPSUMVZmXe2dGGr9gAaLmAOVhGy',
+    baseNytEndpoint: 'https://api.nytimes.com/svc/books/v3/reviews.json?',
 
-// OpenLibrary API
-const baseOpenLibraryEndpoint = 'https://openlibrary.org/api/books?';
+    // OpenLibrary API
+    baseOpenLibraryEndpoint: 'https://openlibrary.org/api/books?'
+}
 
 
 /********** Initialize empty results-tracking attributes **********/
 
-// object of TasteDive search results, associated with simply-named IDs
-let tastediveResultsSimpleList = {};
+let resultsAttributes = {
+    // object of TasteDive search results, associated with simply-named IDs
+    tastediveResultsSimpleList: {},
 
-// string that will be set to either "author" or "book" when the search is submitted
-let tastediveSearchType = '';
+    // string that will be set to either "author" or "book" when the search is submitted
+    tastediveSearchType: ''
+}
+
 
 
 
@@ -35,8 +40,8 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
     // Create a "targetID" for to link the "request for reviews" button to  
     const targetID = `tasteDiveResult-${i}`;
 
-    // Add an object (key:value targetID:searchResultName) to master resultsList
-    tastediveResultsSimpleList[targetID] = resultObject.Name;
+    // Add an object (key:value targetID:searchResultName) to master results List
+    resultsAttributes.tastediveResultsSimpleList[targetID] = resultObject.Name;
 
     return `
         <li>
@@ -49,15 +54,13 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
                 ${summaryInfo}
                 </div>
 
-                <button type='button' id='js-reviews-button-${targetID}' class='js-book-review-button item nyt-button' value='${targetID}'>Click here to search for relevant New York Times book reviews.</button>
+                <button type='button' id='js-reviews-button-${targetID}' class='js-book-review-button item nyt-button' value='${targetID}'>Search for relevant New York Times book reviews.</button>
                 
-                <div id='js-reviews-target-${targetID}' class='result-medium-box reviews-box item hidden'>
-                    <ul id='js-reviews-target-${targetID}'>
-                </div>
+                <div id='js-reviews-target-${targetID}' class='result-medium-box reviews-box item hidden'></div>
 
                 <div class='result-medium-box item buttons-box buttons-group'>
-                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank'><button>Shop for used books.</button></a>
-                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank'><button>Shop at local bookstores.</button></a>
+                    <a href='https://www.alibris.com/booksearch?mtype=B&keyword=${resultHitShorthand}' target='_blank' class='link-out-icon'>Shop for used books.</a>
+                    <a href='https://www.indiebound.org/search/book?keys=${resultHitShorthand}' target='_blank' class='link-out-icon'>Shop at local bookstores.</a>
                 </div>
             </ul>
         </li>`;
@@ -68,7 +71,7 @@ function createGoodResultsListItemString(resultObject) {
     //console.log('Ran createGoodResultsListItemString function.');
 
     return `
-    <p class='thing-summary'>${resultObject.wTeaser}</p>
+    <p class='thing-summary'>${resultObject.wTeaser}</p></br>
     <p class="wiki-ref-link"><a href='${resultObject.wUrl}' target='_blank'>Learn more...</a>.</p>`;
 }
 
@@ -253,8 +256,8 @@ function handleResetForm() {
     $(window).scrollTop(0);
 
     // Reset results list object and searchType thing
-    tastediveResultsSimpleList = {};
-    tastediveSearchType = '';
+    resultsAttributes.tastediveResultsSimpleList = {};
+    resultsAttributes.tastediveSearchType = '';
 }
 
 
@@ -296,9 +299,9 @@ function formatNytQueryParams(queryParams) {
 
     // Determine whether searching for an author or title
     let searchType = '';
-    if (tastediveSearchType === 'author') {
+    if (resultsAttributes.tastediveSearchType === 'author') {
         searchType = 'author=';
-    } else if (tastediveSearchType === 'book') {
+    } else if (resultsAttributes.tastediveSearchType === 'book') {
         searchType = 'title=';
     };
 
@@ -322,13 +325,13 @@ function getTastediveRecommendations(searchTerm, searchType) {
     console.log('Ran getTastediveRecommendations function.')
 
     const params = {
-        key: apiKey1,
+        key: apiStore.apiKey1,
         requestedReference: searchTerm,
         requestedType: searchType
     };
 
     const queryString = formatTasteDiveQueryParams(params);
-    const URLtoBeFetched = baseTasteDiveEndpoint+queryString;
+    const URLtoBeFetched = apiStore.baseTasteDiveEndpoint+queryString;
     console.log(URLtoBeFetched);
 
     fetchJsonp(URLtoBeFetched)
@@ -349,15 +352,15 @@ function getTastediveRecommendations(searchTerm, searchType) {
 function fetchNyTimesReviews(queryID) {
     console.log('Ran fetchNyTimesReviews function.')
 
-    const queryTerm = tastediveResultsSimpleList[queryID];
+    const queryTerm = resultsAttributes.tastediveResultsSimpleList[queryID];
 
     const params = {
-        key: apiKey2,
+        key: apiStore.apiKey2,
         requestedReference: queryTerm
     };
 
     const queryString = formatNytQueryParams(params);
-    const URLtoBeFetched = baseNytEndpoint+queryString;
+    const URLtoBeFetched = apiStore.baseNytEndpoint+queryString;
     
     console.log(URLtoBeFetched);
 
@@ -381,7 +384,7 @@ function fetchOpenLibraryBooks(queryISBNs) {
     console.log('Need to look up the ISBN '+queryISBNs);
 
     const queryString = formatOpenLibQueryParams(queryISBNs);
-    const URLtoBeFetched = baseOpenLibraryEndpoint+queryString;
+    const URLtoBeFetched = apiStore.baseOpenLibraryEndpoint+queryString;
 
     console.log(URLtoBeFetched);
 
@@ -411,7 +414,7 @@ function watchTastediveSearchForm() {
 
         const searchTerm = $('#tastedive-search-field').val();
         const searchType = $('.tastedive-search-type').val();
-        tastediveSearchType = searchType;
+        resultsAttributes.tastediveSearchType = searchType;
 
         getTastediveRecommendations(searchTerm, searchType);
     })

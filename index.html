@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Book Recommendation App</title>
+  <title>BookFinder</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet"
     type="text/css" />
   <link href="style.css" rel="stylesheet" type="text/css" />
@@ -26,7 +26,7 @@
             <h1>BookFinder</h1>
           </div>
           <div class="reset-button-container">
-            <button class='fresh-search hidden' type='click'>Try a fresh search.</button>
+            <button class='fresh-search hidden' type='button'>Try a fresh search.</button>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
         <div class='item buttons-group'>
           <!-- primary search field -->
           <label for='tastedive-search-field' class='search-label'>Author/Book:</label>
-            <input type='text' name='tastedive-search-field' id='tastedive-search-field' required></input>
+            <input type='text' name='tastedive-search-field' id='tastedive-search-field' required>
           
           <!-- dropdown menu for book/author -->
           <select class='tastedive-search-type' size="1">
@@ -56,7 +56,7 @@
         <button type='submit' class='item'>Find my recommendations!</button>
       </form>
 
-      <section class='js-error-message result-big-box hidden'></section>
+      <div class='js-error-message result-big-box hidden'></div>
 
       <div class='search-tips-div result-big-box group hidden'>
         <div>
@@ -93,7 +93,7 @@
         <div>
           <form class='open-library-form buttons-group'>
             <label for="js-isbn-field" class='search-label'>ISBN:</label>
-              <input type="text" name="js-isbn-field" id="js-isbn-field"></input>
+              <input type="text" name="js-isbn-field" id="js-isbn-field">
             <button type="submit">Find an Open Library book!</button>
           </form>
         </div>

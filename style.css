@@ -144,7 +144,7 @@ button {
   margin: 0px;
   font-size: 30px;
   text-align: left;
-  txt-shadow: 0 0 10px rgb(143, 143, 143);
+  text-shadow: 0 0 10px rgb(143, 143, 143);
 }
 
 .js-results-list {
@@ -169,6 +169,16 @@ button {
 
 .buttons-box {
   width: 60%;
+}
+
+.link-out-icon {
+  background-color: rgb(110, 109, 109);
+  border-radius: 6px;
+  border: 1px solid rgb(44, 44, 44);
+  box-shadow: 0 0 5px grey;
+  padding: 5px;
+  margin: 5px 0px;
+  text-align: center;
 }
 
 .wiki-ref-link {
@@ -222,10 +232,22 @@ button {
 
 
 /*--- pseudo-classes ---*/ 
-main a:link    { color: rgb(23, 76, 156);}
+main a:link    { 
+  color: rgb(23, 76, 156);
+  text-decoration: none;
+}
 main a:visited { color: rgb(69, 120, 187);}
-main a:hover   { color: rgb(72, 129, 235);}
+main a:hover   { 
+  color: rgb(72, 129, 235);
+  text-shadow: 0 0 1px rgb(158, 158, 158);
+}
 main a:active  { color: deepskyblue;}
+
+.buttons-box a:link { color: rgb(240, 238, 238);}
+.buttons-box a:visited { color: rgb(240, 238, 238);}
+.buttons-box a:hover { color: rgb(240, 238, 238);}
+.buttons-box a:active { color: rgb(240, 238, 238);}
+
 
 
 /*--- Groups & Items (Mobile First) ---*/
@@ -313,6 +335,15 @@ main a:active  { color: deepskyblue;}
     width: auto;
   }
   
+  button:hover {
+    cursor: pointer;
+    box-shadow: 0 0 15px rgb(77, 77, 77);
+  }
+
+  .fresh-search:hover {
+    box-shadow: 0 0 20px black;
+  }
+
   .buttons-box {
     width: 80%;
   }
@@ -328,6 +359,11 @@ main a:active  { color: deepskyblue;}
   
   .reviews-box h3 {
     margin: 10px;
+  }
+
+  .link-out-icon:hover {
+    cursor: pointer;
+    box-shadow: 0 0 15px rgb(82, 82, 82);
   }
 
   .no-nyt-reviews-message {
