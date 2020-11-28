@@ -35,7 +35,7 @@ let resultsAttributes = {
 function createResultsListItemString(resultObject,i,summaryInfo) {
 
     // Create a shorthand name replacing spaces with plus signs, for Alibris/Indiebound URLs
-    const resultHitShorthand = resultObject.Name.replace(/ /g, '+');
+    const resultHitShorthand = resultObject.Name.replace(/ /g, '+').replace(/'/g, '%27');
 
     // Create a "targetID" for to link the "request for reviews" button to  
     const targetID = `tasteDiveResult-${i}`;
@@ -72,7 +72,7 @@ function createGoodResultsListItemString(resultObject) {
 
     return `
     <p class='thing-summary'>${resultObject.wTeaser}</p></br>
-    <p class="wiki-ref-link"><a href='${resultObject.wUrl}' target='_blank'>Learn more...</a>.</p>`;
+    <p class="wiki-ref-link"><a href="${resultObject.wUrl}" target='_blank'>Learn more...</a>.</p>`;
 }
 
 // Create the HTML string containing "no teaser" message + formatted Google search, if Wiki info UNavailable from Tastedive results
