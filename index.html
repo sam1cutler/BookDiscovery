@@ -17,22 +17,22 @@
 </head>
 
 <body>
-  <main>
-
-    <header>
-      <div class='header-wrapper'>
-        <div class='header-group'>
-          <div class='page-title'>
-            <h1>BookFinder</h1>
-          </div>
-          <div class="reset-button-container">
-            <button class='fresh-search hidden' type='button'>Try a fresh search.</button>
-          </div>
+  
+  <header>
+    <div class='header-wrapper'>
+      <div class='header-group'>
+        <div class='page-title'>
+          <h1>BookFinder</h1>
+        </div>
+        <div class="reset-button-container">
+          <button class='fresh-search hidden' type='button'>Try a fresh search.</button>
         </div>
       </div>
-      <hr>
-    </header>
+    </div>
+    <hr>
+  </header>
 
+  <main>
     <section class='submission-section pageContainer submission-group'>
       <div class='result-big-box primary-instruction group'>
         <h2 class='item'>Find new books to read!</h2>
@@ -104,15 +104,16 @@
     </section>
 
     <hr>
-
-    <footer>
-      <h4>This tool uses the 
-        <a href='https://tastedive.com/read/api' target='_blank'>TasteDive API to create the recommendation lists,</a> 
-        the <a href="https://developer.nytimes.com/docs/books-product/1/overview" target='_blank'>New York Times Books API</a> to find NYTimes book reviews, and
-        the <a href="https://openlibrary.org/dev/docs/api/books" target='_blank'>Open Library API</a> to search for free online rentals.</h4>
-    </footer>
-
+  
   </main>
+
+  <footer>
+    <h4>This tool uses the 
+      <a href='https://tastedive.com/read/api' target='_blank'>TasteDive API to create the recommendation lists,</a> 
+      the <a href="https://developer.nytimes.com/docs/books-product/1/overview" target='_blank'>New York Times Books API</a> to find NYTimes book reviews, and
+      the <a href="https://openlibrary.org/dev/docs/api/books" target='_blank'>Open Library API</a> to search for free online rentals.</h4>
+  </footer>
+
   <script src="https://code.jquery.com/jquery-3.4.1.slim.js" crossorigin="anonymous"></script>
   <script src="index.js"></script>
   <script src="jsonPlibrary.js"></script>
