@@ -68,8 +68,6 @@ function createResultsListItemString(resultObject,i,summaryInfo) {
 
 // Create the HTML string containing Wiki teaser + link, if available from Tastedive results
 function createGoodResultsListItemString(resultObject) {
-    //console.log('Ran createGoodResultsListItemString function.');
-
     return `
     <p class='thing-summary'>${resultObject.wTeaser}</p></br>
     <p class="wiki-ref-link"><a href="${resultObject.wUrl}" target='_blank'>Learn more...</a>.</p>`;
@@ -77,8 +75,6 @@ function createGoodResultsListItemString(resultObject) {
 
 // Create the HTML string containing "no teaser" message + formatted Google search, if Wiki info UNavailable from Tastedive results
 function createSparseResultsSummary(resultObject) {
-    //console.log('Ran createSparseResultsSummary function.');
-
     // Create a Google search URL
     const googleSearchQuery = encodeURIComponent(resultObject.Name);
     const googleSearchUrl = 'https://www.google.com/search?q='+googleSearchQuery;
@@ -91,7 +87,6 @@ function createSparseResultsSummary(resultObject) {
 
 // Create TasteDive Results List + insert into the DOM.
 function displayGoodTasteDiveResults(resultsArray, searchTermName) {
-    console.log('Ran displayGoodTasteDiveResults function.');
 
     // Provide to user the successfully-parsed name of what they searched for
     const successfulMessage = `
@@ -134,16 +129,12 @@ function displayGoodTasteDiveResults(resultsArray, searchTermName) {
 
 // Logic to determine how to handle the TasteDive search results
 function handleTasteDiveResults(responseJson) {
-    console.log('Ran handleTasteDiveResults function.');
-    console.log(responseJson);
 
     if (responseJson.Similar.Results.length === 0) {
-        console.log('Did not get any search results.');
         $('.js-error-message').html('<h4>This search did not get any results. Please try again.');
         $('.js-error-message').removeClass('hidden');
         $('.search-tips-div').removeClass('hidden');
     } else {
-        console.log('Got search results!');
         $('.js-error-message').empty();
         displayGoodTasteDiveResults(responseJson.Similar.Results, responseJson.Similar.Info[0].Name);
     };
@@ -151,7 +142,6 @@ function handleTasteDiveResults(responseJson) {
 
 // Create NYT reviews results list
 function displayNytResults(reviewResultsArray) {
-    console.log('Ran displayNytResults function');
 
     let nytReviewHTML = `
         <h3>New York Times book reviews:</h3>
@@ -171,8 +161,6 @@ function displayNytResults(reviewResultsArray) {
 
 // Create OpenLib results list
 function displayOpenLibResults(results, queryISBNs) {
-    console.log('Ran displayOpenLibResults function.');
-
     const ISBNcall = `${queryISBNs}`;
 
     const openLibHTML = `
@@ -183,14 +171,12 @@ function displayOpenLibResults(results, queryISBNs) {
             </div>
         </div>`;
 
-
     return openLibHTML;
 }
 
 
 // Handle NYTimes Books API search results
 function handleNytResults(responseJson,queryID) {
-    console.log('Ran handleNytResults function.');
 
     let nytReviewHTML = ''
 
@@ -211,7 +197,6 @@ function handleNytResults(responseJson,queryID) {
 
 // Handle OpenLibrary API search results
 function handleOpenLibraryResults(responseJson, queryISBNs) {
-    console.log('Ran handleOpenLibraryResults function.');
 
     let openLibHTML = ''
 
@@ -227,7 +212,6 @@ function handleOpenLibraryResults(responseJson, queryISBNs) {
 
 // Handle clicks of the reset search form button
 function handleResetForm() {
-    console.log('Ran handleResetForm function.');
 
     // Empty contents of the results list and hide the results section
     $('.js-successful-search-message').empty();
@@ -266,7 +250,6 @@ function handleResetForm() {
 // Create the query string for the GET request.
 
 function formatTasteDiveQueryParams(queryParams) {
-    console.log('Ran formatTasteDiveQueryParams function.')
 
     // Initialize empty start to queryString.
     let queryString = 'q=';
@@ -283,18 +266,14 @@ function formatTasteDiveQueryParams(queryParams) {
     // Add additional query parameters: 
     queryString += '&type=author';   // => specify types in response (this doesn't seem to actually work as claimed, probably remove eventually)
     queryString += '&callback';      // => specify JSONP format
-    //queryString += '&limit=5';       // => add limit to # of search results (seems to mess up CORB requirement?)
     queryString += queryParams.key;  // => add the API key
 
     return queryString;
 }
 
 function formatNytQueryParams(queryParams) {
-    console.log('Ran formatNytQueryParams function.');
 
     // true query term omits the end-of-the-string tag for author/title type
-    //const coreQuery = queryParams.requestedReference.slice(0,-7);
-
     const coreQuery = queryParams.requestedReference.replace(/ /g, '+');
 
     // Determine whether searching for an author or title
@@ -311,7 +290,6 @@ function formatNytQueryParams(queryParams) {
 }
 
 function formatOpenLibQueryParams(queryParams) {
-    console.log('Ran formatOpenLibQueryParams function.');
 
     const queryString = `bibkeys=${queryParams}&format=json`;
 
@@ -322,7 +300,6 @@ function formatOpenLibQueryParams(queryParams) {
 
 // Submit the TasteDive API GET request.
 function getTastediveRecommendations(searchTerm, searchType) {
-    console.log('Ran getTastediveRecommendations function.')
 
     const params = {
         key: apiStore.apiKey1,
@@ -332,13 +309,11 @@ function getTastediveRecommendations(searchTerm, searchType) {
 
     const queryString = formatTasteDiveQueryParams(params);
     const URLtoBeFetched = apiStore.baseTasteDiveEndpoint+queryString;
-    console.log(URLtoBeFetched);
 
     fetchJsonp(URLtoBeFetched)
         .then(response => {
             if (response.ok) {
                 return response.json();
-                //console.log(response.json());
             }
             throw new Error(response.statusText);
         })
@@ -350,7 +325,6 @@ function getTastediveRecommendations(searchTerm, searchType) {
 
 // Submit the NYTimes Books API GET request.
 function fetchNyTimesReviews(queryID) {
-    console.log('Ran fetchNyTimesReviews function.')
 
     const queryTerm = resultsAttributes.tastediveResultsSimpleList[queryID];
 
@@ -361,14 +335,11 @@ function fetchNyTimesReviews(queryID) {
 
     const queryString = formatNytQueryParams(params);
     const URLtoBeFetched = apiStore.baseNytEndpoint+queryString;
-    
-    console.log(URLtoBeFetched);
 
     fetch(URLtoBeFetched)
         .then(response => {
             if (response.ok) {
                 return response.json();
-                //console.log(response.json());
             }
             throw new Error(response.statusText);
         })
@@ -380,19 +351,14 @@ function fetchNyTimesReviews(queryID) {
 
 // Submit the Open Library API GET request.
 function fetchOpenLibraryBooks(queryISBNs) {
-    console.log('Ran fetchOpenLIbraryBooks function.');
-    console.log('Need to look up the ISBN '+queryISBNs);
 
     const queryString = formatOpenLibQueryParams(queryISBNs);
     const URLtoBeFetched = apiStore.baseOpenLibraryEndpoint+queryString;
-
-    console.log(URLtoBeFetched);
 
     fetch(URLtoBeFetched)
         .then(response => {
             if (response.ok) {
                 return response.json();
-                //console.log(response.json());
             }
             throw new Error(response.statusText);
         })
@@ -406,11 +372,9 @@ function fetchOpenLibraryBooks(queryISBNs) {
 
 // Set up event listener on primary submission form
 function watchTastediveSearchForm() {
-    console.log('Ran watchTastediveSearchForm.')
 
     $('.tastedive-search-form').on('submit', function(event) {
         event.preventDefault();
-        console.log('The TasteDive search form was submitted.')
 
         const searchTerm = $('#tastedive-search-field').val();
         const searchType = $('.tastedive-search-type').val();
@@ -422,10 +386,8 @@ function watchTastediveSearchForm() {
 
 // Set up event listener on "Show NYT Reviews" button
 function watchNyTimesReviewsRequest() {
-    console.log('Ran watchNyTimesReviewsRequest function.')
     $('.results-section').on('click','.js-book-review-button', function(event) {
         event.preventDefault();
-        console.log('User requested NY Times reviews.');
         const requestedFeature = $(this).val();
         fetchNyTimesReviews(requestedFeature);
     })
@@ -433,11 +395,9 @@ function watchNyTimesReviewsRequest() {
 
 // Set up event listener on Open Library Search Form
 function watchOpenLibraryRequest() {
-    console.log('Ran watchOpenLibraryRequest function.');
 
     $('.open-library-section').on('submit','.open-library-form', function(event) {
         event.preventDefault();
-        console.log('User requested ISBN lookup on Open Library.');
         
         const requestedISBN = $('#js-isbn-field').val();
         fetchOpenLibraryBooks(requestedISBN);
@@ -446,17 +406,14 @@ function watchOpenLibraryRequest() {
 
 // Set up event listener on Reset Form
 function watchResetForm() {
-    console.log('Ran watchResetForm function.')
 
     $('.fresh-search').on('click', function(event) {
-        console.log('User requested to reset the search form.');
         handleResetForm();
     })
 }
 
 // Run the event-listeners-setup function
 function handleLookupPage() {
-    console.log('Ran handleLookupPage function.');
     watchTastediveSearchForm();
     watchNyTimesReviewsRequest();
     watchOpenLibraryRequest();

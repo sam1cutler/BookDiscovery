@@ -30,4 +30,4 @@ This project is built with HTML, CSS, Javascript, and jQuery.
 You can find [my GitHub page here](https://github.com/sam1cutler).
 
 ## Acknowledgements
-This project is the API Capstone project for the Thinkful software engineering bootcamp. 
+This project was completed as part of the Thinkful full-stack engineering program. 
